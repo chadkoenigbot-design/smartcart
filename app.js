@@ -1077,15 +1077,102 @@ function saveListAs(name) {
   if (!name.trim() || state.groceryList.length === 0) return null;
   const lists = getSavedLists();
   const existingIdx = lists.findIndex(l => l.name.toLowerCase() === name.toLowerCase().trim());
+  const existing = existingIdx >= 0 ? lists[existingIdx] : null;
+  // Capture goal context from current session (if goal was generated) or preserve existing
+  const hasCurrentGoal = !!currentGoalState.goalText;
   const entry = {
-    id: existingIdx >= 0 ? lists[existingIdx].id : Date.now().toString(),
+    id: existing ? existing.id : Date.now().toString(),
     name: name.trim(),
     items: state.groceryList.map(i => ({ name: i.name, quantity: i.quantity })),
     savedAt: new Date().toISOString(),
+    goalText:         hasCurrentGoal ? currentGoalState.goalText         : (existing ? existing.goalText         : ''),
+    goalProfileKey:   hasCurrentGoal ? (currentGoalState.baseProfile ? currentGoalState.baseProfile.key : null) : (existing ? existing.goalProfileKey   : null),
+    activeRefinements: hasCurrentGoal ? Array.from(currentGoalState.activeRefinements) : (existing ? existing.activeRefinements : []),
+    manualAdditions:   hasCurrentGoal ? [...currentGoalState.manualAdditions]           : (existing ? existing.manualAdditions   : []),
   };
   if (existingIdx >= 0) { lists[existingIdx] = entry; } else { lists.unshift(entry); }
   persistLists(lists);
   return entry;
+}
+
+function updateListGoal(id) {
+  if (!currentGoalState.baseProfile) return;
+  const lists = getSavedLists();
+  const idx = lists.findIndex(l => l.id === id);
+  if (idx < 0) return;
+  lists[idx] = {
+    ...lists[idx],
+    goalText:          currentGoalState.goalText,
+    goalProfileKey:    currentGoalState.baseProfile.key,
+    activeRefinements: Array.from(currentGoalState.activeRefinements),
+    manualAdditions:   [...currentGoalState.manualAdditions],
+  };
+  persistLists(lists);
+  renderSavedLists();
+  showToast('Goal saved to list!');
+}
+
+function openGoalForList(id) {
+  const list = getSavedLists().find(l => l.id === id);
+  if (!list) return;
+  currentEditingListId = id;
+
+  const goalInput = document.getElementById('goal-input');
+  if (goalInput) goalInput.value = list.goalText || '';
+
+  if (list.goalProfileKey && GOAL_PROFILES[list.goalProfileKey]) {
+    const baseProfile = { key: list.goalProfileKey, ...GOAL_PROFILES[list.goalProfileKey] };
+    currentGoalState = {
+      baseProfile,
+      activeRefinements: new Set(list.activeRefinements || []),
+      goalText: list.goalText || '',
+      manualAdditions: list.manualAdditions || [],
+    };
+    _renderGoalResults(true);
+  } else if (list.goalText) {
+    const goal = parseGoal(list.goalText);
+    renderGoalSuggestions(goal, list.goalText);
+  }
+
+  showGoalEditingBanner(list.name);
+  switchTab('goals');
+}
+
+function showGoalEditingBanner(listName) {
+  let banner = document.getElementById('goal-editing-banner');
+  if (!banner) {
+    banner = document.createElement('div');
+    banner.id = 'goal-editing-banner';
+    banner.className = 'goal-editing-banner';
+    const goalsMain = document.querySelector('#tab-goals .main');
+    if (goalsMain) goalsMain.insertBefore(banner, goalsMain.firstChild);
+  }
+  banner.innerHTML = `
+    <div class="container">
+      <div class="goal-editing-banner-inner">
+        <div class="goal-editing-banner-info">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+          <span>Editing goal for <strong>${escHtml(listName)}</strong> — update the goal below and regenerate, then save changes back.</span>
+        </div>
+        <div class="goal-editing-banner-actions">
+          <button class="btn-save-goal-update" id="save-goal-to-list-btn">Save Goal Update</button>
+          <button class="btn-cancel-goal-edit" id="cancel-goal-edit-btn">Dismiss</button>
+        </div>
+      </div>
+    </div>`;
+  banner.style.display = '';
+
+  document.getElementById('save-goal-to-list-btn').addEventListener('click', () => {
+    if (!currentGoalState.baseProfile) { showToast('Generate a plan first, then save'); return; }
+    updateListGoal(currentEditingListId);
+    currentEditingListId = null;
+    banner.style.display = 'none';
+  });
+
+  document.getElementById('cancel-goal-edit-btn').addEventListener('click', () => {
+    currentEditingListId = null;
+    banner.style.display = 'none';
+  });
 }
 
 function deleteList(id) {
@@ -1119,10 +1206,25 @@ function renderSavedLists() {
     const date = new Date(l.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
     const count = l.items.length;
     const preview = l.items.slice(0, 5).map(i => escHtml(i.name)).join(', ') + (l.items.length > 5 ? ` +${l.items.length - 5} more` : '');
+    const hasGoal = !!(l.goalText && l.goalProfileKey);
+    const goalProfile = hasGoal ? GOAL_PROFILES[l.goalProfileKey] : null;
+    const goalBadge = goalProfile ? `
+      <div class="saved-list-goal-badge">
+        <span class="saved-list-goal-icon" aria-hidden="true">${goalProfile.badge}</span>
+        <span class="saved-list-goal-label">${escHtml(goalProfile.headline)}</span>
+      </div>` : '';
+    const editGoalBtn = `
+      <button class="btn-edit-goal" onclick="openGoalForList('${escHtml(l.id)}')">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        ${hasGoal ? 'Edit Goal' : 'Set Goal'}
+      </button>`;
     return `
       <div class="saved-list-card card fade-in">
         <div class="saved-list-info">
-          <div class="saved-list-name">${escHtml(l.name)}</div>
+          <div class="saved-list-name-row">
+            <div class="saved-list-name">${escHtml(l.name)}</div>
+            ${goalBadge}
+          </div>
           <div class="saved-list-meta">${count} item${count !== 1 ? 's' : ''} &nbsp;·&nbsp; Saved ${date}</div>
           <div class="saved-list-preview">${preview}</div>
         </div>
@@ -1131,6 +1233,7 @@ function renderSavedLists() {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
             Load
           </button>
+          ${editGoalBtn}
           <button class="btn-delete-list" onclick="deleteList('${escHtml(l.id)}')">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
             Delete
@@ -1452,6 +1555,7 @@ const REFINEMENT_DEFS = {
 };
 
 let currentGoalState = { baseProfile: null, activeRefinements: new Set(), goalText: '', manualAdditions: [] };
+let currentEditingListId = null; // id of saved list whose goal is being edited in Goals tab
 
 function applyRefinements(baseProfile, activeRefinements) {
   const profile = {
