@@ -1305,6 +1305,34 @@ function addReceipt(receipt) {
   localStorage.setItem(RECEIPTS_KEY, JSON.stringify(all.slice(0, 50)));
 }
 
+function seedBudgetDemoData() {
+  if (!getBudget()) {
+    saveBudget({ period: 'weekly', amount: 185 });
+  }
+  if (getReceipts().length > 0) return;
+
+  const now = new Date();
+  const sampleDates = [2, 4, 6].map(daysAgo => {
+    const d = new Date(now);
+    d.setDate(now.getDate() - daysAgo);
+    return d.toISOString();
+  });
+
+  const seeded = RECEIPT_TEMPLATES.slice(0, 3).map((tpl, i) => {
+    const total = tpl.items.reduce((sum, item) => sum + item.total, 0);
+    return {
+      id: `demo-${i + 1}`,
+      store: tpl.store,
+      date: sampleDates[i] || now.toISOString(),
+      items: tpl.items,
+      total,
+      source: 'demo'
+    };
+  });
+
+  localStorage.setItem(RECEIPTS_KEY, JSON.stringify(seeded));
+}
+
 // ── Mock receipt templates (simulated scan results) ──────────────────────────
 const RECEIPT_TEMPLATES = [
   {
@@ -2569,6 +2597,8 @@ function _renderGoalResults(initial = false) {
 // ─────────────────────────────────────────────────────────────────────────────
 
 document.addEventListener('DOMContentLoaded', () => {
+
+  seedBudgetDemoData();
 
   // ── Household size
   const sizePicker = el('size-picker');
