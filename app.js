@@ -332,7 +332,7 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
     // Edge case: local is actually cheaper in this region
     rec = 'local';
     actualSavings = 0;
-    reasoning = `Local stores in your area are actually competitive on this item — no bulk savings here.`;
+    reasoning = `Local stores in your area are competitive on this item — ${fmt(localPrice)}/${unit} locally vs. ${fmt(warehousePrice)} warehouse — no bulk advantage here.`;
   } else if (suit === 'low') {
     rec = 'local';
     reasoning = catMeta.note;
@@ -341,17 +341,17 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
     if (catMeta.bulkWasteRisk && effectiveWarehouseTotal > localTotal * 1.05) {
       // Waste penalty erases the savings
       rec = 'local';
-      reasoning = `Even though ${catMeta.name.toLowerCase()} is great in bulk for larger households, your household size means the warehouse minimum (${warehouseQty} ${unit}) may exceed what you'll use. Buying locally avoids potential waste.`;
+      reasoning = `Warehouse minimum is ${warehouseQty} ${unit} at ${fmt(warehousePrice)}/unit. For your household, that risks spoilage that erases the savings. ${fmt(localPrice)}/${unit} locally is the safer call.`;
       confidence = 'medium';
     } else {
       rec = 'warehouse';
       actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
       if (perUnitPct >= 0.40) {
-        reasoning = `Outstanding bulk value — ${Math.round(perUnitPct * 100)}% cheaper per ${unit} vs. your local store. A clear win.`;
+        reasoning = `${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally — ${Math.round(perUnitPct * 100)}% cheaper per unit. A clear bulk win.`;
       } else if (perUnitPct >= 0.25) {
-        reasoning = `Solid bulk savings at ${Math.round(perUnitPct * 100)}% less per ${unit}. ${catMeta.note}`;
+        reasoning = `${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally — ${Math.round(perUnitPct * 100)}% savings. ${catMeta.note}`;
       } else {
-        reasoning = `Modestly cheaper in bulk (${Math.round(perUnitPct * 100)}% per ${unit}). ${catMeta.note}`;
+        reasoning = `${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally — ${Math.round(perUnitPct * 100)}% per-unit savings. ${catMeta.note}`;
       }
       confidence = perUnitPct >= 0.30 ? 'high' : 'medium';
     }
@@ -361,12 +361,12 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
       // Household meets or exceeds threshold — warehouse makes strong sense
       if (catMeta.bulkWasteRisk && effectiveWarehouseTotal > localTotal * 1.05) {
         rec = 'local';
-        reasoning = `Even with ${householdSize} people, the warehouse minimum on this perishable item may create waste. Buy locally for better value.`;
+        reasoning = `Even with ${householdSize} people, the warehouse quantity (${warehouseQty} ${unit} at ${fmt(warehousePrice)}/unit) may create waste. ${fmt(localPrice)}/${unit} locally keeps cost predictable.`;
         confidence = 'medium';
       } else {
         rec = 'warehouse';
         actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
-        reasoning = `With ${householdSize} people, you'll move through this before it spoils. ${Math.round(perUnitPct * 100)}% savings per ${unit} — warehouse recommended.`;
+        reasoning = `With ${householdSize} people you'll use this before it spoils. ${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally — ${Math.round(perUnitPct * 100)}% savings.`;
         confidence = 'high';
       }
     } else if (householdScore >= 0.65) {
@@ -374,11 +374,11 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
       if (catMeta.bulkWasteRisk && effectiveWarehouseTotal <= localTotal * 1.10) {
         rec = 'warehouse';
         actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
-        reasoning = `${householdSize}-person household is slightly below the ideal threshold for bulk ${catMeta.name.toLowerCase()}, but the savings (${Math.round(perUnitPct * 100)}%/unit) are strong enough to recommend it. Use before it spoils.`;
+        reasoning = `${householdSize}-person household is slightly small for this category, but ${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally (${Math.round(perUnitPct * 100)}% savings) makes it worthwhile. Use promptly.`;
         confidence = 'medium';
       } else {
         rec = 'local';
-        reasoning = `For ${householdSize} people, warehouse quantities of this perishable item carry waste risk that could offset the savings. Buy fresh locally.`;
+        reasoning = `For ${householdSize} people, the warehouse quantity carries waste risk that could offset the savings vs. ${fmt(localPrice)}/${unit} locally. Buy fresh.`;
         confidence = 'medium';
       }
     } else {
@@ -387,11 +387,11 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
         // Non-perishable with strong savings — still warehouse
         rec = 'warehouse';
         actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
-        reasoning = `Item stores well even in smaller households. ${Math.round(perUnitPct * 100)}% per-unit savings make it worth stocking up.`;
+        reasoning = `Shelf-stable — safe to stock up for any household size. ${fmt(warehousePrice)}/${unit} warehouse vs. ${fmt(localPrice)}/${unit} locally — ${Math.round(perUnitPct * 100)}% per-unit savings.`;
         confidence = 'medium';
       } else {
         rec = 'local';
-        reasoning = `For a ${householdSize}-person household, buying this in bulk risks waste or storage issues. ${catMeta.note}`;
+        reasoning = `For a ${householdSize}-person household, bulk quantities risk waste or storage issues. ${fmt(localPrice)}/${unit} locally is the smarter pick. ${catMeta.note}`;
         confidence = householdScore >= 0.4 ? 'medium' : 'high';
       }
     }
@@ -700,6 +700,53 @@ function buildRecItemHTML(r) {
   </div>`;
 }
 
+function buildShoppingPlan(analysis) {
+  if (analysis.items.length === 0) return '';
+
+  const makeItems = items => items.map(r => `
+    <li class="plan-item" tabindex="0">
+      <span class="plan-check" aria-hidden="true"></span>
+      <span class="plan-item-icon" aria-hidden="true">${r.catMeta.icon}</span>
+      <span class="plan-item-name">${r.catalogName}</span>
+      <span class="plan-item-qty">× ${r.localQty} ${r.unit}</span>
+    </li>`).join('');
+
+  const wCol = analysis.warehouseItems.length > 0 ? `
+    <div class="plan-col plan-col-warehouse">
+      <div class="plan-col-head">
+        <div class="plan-col-head-left">
+          <span class="plan-col-store-icon">🏬</span>
+          <span class="plan-col-title">Warehouse Club</span>
+          <span class="plan-col-count">${analysis.warehouseItems.length}</span>
+        </div>
+        <button class="plan-copy-btn" data-copy-target="plan-wh">Copy list</button>
+      </div>
+      <ul class="plan-list" id="plan-wh">${makeItems(analysis.warehouseItems)}</ul>
+    </div>` : '';
+
+  const lCol = analysis.localItems.length > 0 ? `
+    <div class="plan-col plan-col-local">
+      <div class="plan-col-head">
+        <div class="plan-col-head-left">
+          <span class="plan-col-store-icon">🏪</span>
+          <span class="plan-col-title">Local Grocery</span>
+          <span class="plan-col-count">${analysis.localItems.length}</span>
+        </div>
+        <button class="plan-copy-btn" data-copy-target="plan-loc">Copy list</button>
+      </div>
+      <ul class="plan-list" id="plan-loc">${makeItems(analysis.localItems)}</ul>
+    </div>` : '';
+
+  return `
+    <div class="shopping-plan-wrap">
+      <div class="shopping-plan-hdr">
+        <h3 class="shopping-plan-title">Your Shopping Plan</h3>
+        <span class="shopping-plan-hint">Tap any item to check it off</span>
+      </div>
+      <div class="plan-columns">${wCol}${lCol}</div>
+    </div>`;
+}
+
 function renderResults(analysis) {
   const region = state.locationInfo.region;
 
@@ -773,6 +820,32 @@ function renderResults(analysis) {
       </div>
     </div>
   `;
+
+  // Shopping plan
+  el('shopping-plan').innerHTML = buildShoppingPlan(analysis);
+  el('shopping-plan').querySelectorAll('.plan-item').forEach(item => {
+    item.addEventListener('click', () => item.classList.toggle('plan-item-done'));
+    item.addEventListener('keydown', e => {
+      if (e.key === ' ' || e.key === 'Enter') { e.preventDefault(); item.classList.toggle('plan-item-done'); }
+    });
+  });
+  el('shopping-plan').querySelectorAll('.plan-copy-btn').forEach(btn => {
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      const list = el(btn.dataset.copyTarget);
+      if (!list) return;
+      const lines = [...list.querySelectorAll('.plan-item')].map(li => {
+        const name = li.querySelector('.plan-item-name').textContent;
+        const qty = li.querySelector('.plan-item-qty').textContent;
+        return `• ${name} ${qty}`;
+      });
+      navigator.clipboard.writeText(lines.join('\n')).then(() => {
+        btn.textContent = 'Copied!';
+        btn.classList.add('plan-copy-btn-done');
+        setTimeout(() => { btn.textContent = 'Copy list'; btn.classList.remove('plan-copy-btn-done'); }, 2000);
+      }).catch(() => {});
+    });
+  });
 
   // ── Item breakdown — grouped by recommendation
   let recHTML = '';
