@@ -22,6 +22,12 @@
           <span class="logo-text">SmartCart</span>
         </div>
         <p class="header-tagline">Know exactly where to buy every item on your list.</p>
+        <button class="header-profile-chip" id="header-profile-chip" data-goto-tab="profile" style="display:none">
+          <span class="header-profile-avatar" id="header-profile-avatar">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </span>
+          <span id="header-profile-name">Profile</span>
+        </button>
       </div>
     </div>
     <!-- Tab navigation -->
@@ -43,6 +49,10 @@
           <button class="nav-tab" data-tab="overview" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             How It Works
+          </button>
+          <button class="nav-tab" data-tab="profile" role="tab" aria-selected="false" id="nav-tab-profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="nav-profile-label">Profile</span>
           </button>
         </nav>
       </div>
@@ -400,6 +410,14 @@
             </button>
           </div>
 
+          <!-- Profile goal hint (shown if profile has a saved fitness goal) -->
+          <div id="profile-goal-hint" class="profile-goal-hint" style="display:none">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="profile-goal-hint-text">Your saved goal:</span>
+            <button class="profile-goal-hint-use" id="profile-goal-hint-use">Use it →</button>
+            <button class="profile-goal-hint-dismiss" id="profile-goal-hint-dismiss" aria-label="Dismiss">×</button>
+          </div>
+
           <!-- In-session planning thread -->
           <div id="planner-thread" class="planner-thread" style="display:none"></div>
 
@@ -665,6 +683,215 @@
     </main>
 
   </div><!-- /tab-overview -->
+
+
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: PROFILE                                      -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-profile" style="display:none">
+
+    <!-- Profile Hero -->
+    <div class="profile-tab-hero">
+      <div class="container">
+        <div class="profile-tab-hero-inner">
+          <div class="profile-tab-avatar" id="profile-tab-avatar">
+            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div class="profile-tab-hero-name" id="profile-tab-hero-name">Your Profile</div>
+            <div class="profile-tab-hero-sub">Personalize SmartCart to your household — saved locally in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="container">
+        <section class="section" style="padding-top:0">
+
+          <!-- YOUR INFO -->
+          <div class="profile-form-section-label">Your Info</div>
+          <div class="card profile-form-card">
+
+            <div class="profile-field">
+              <label class="profile-label" for="profile-name">Name or household label</label>
+              <input type="text" id="profile-name" class="text-input" placeholder="e.g. Chad, The Johnson Family, Apt 4B..." maxlength="40">
+            </div>
+
+            <div class="profile-field">
+              <label class="profile-label">Household size</label>
+              <div class="size-picker" id="profile-size-picker">
+                <button class="size-btn" data-val="1">1</button>
+                <button class="size-btn active" data-val="2">2</button>
+                <button class="size-btn" data-val="3">3</button>
+                <button class="size-btn" data-val="4">4</button>
+                <button class="size-btn" data-val="5">5</button>
+                <button class="size-btn" data-val="6">6+</button>
+              </div>
+            </div>
+
+            <div class="profile-field profile-field-row2">
+              <div class="profile-field-half">
+                <label class="profile-label" for="profile-zip">ZIP Code</label>
+                <input type="text" id="profile-zip" class="text-input" placeholder="e.g. 10001" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+              </div>
+              <div class="profile-field-half">
+                <label class="profile-label">Warehouse Membership</label>
+                <div class="membership-toggle" style="margin-bottom:0">
+                  <button class="toggle-opt active" id="profile-toggle-yes">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    I have one
+                  </button>
+                  <button class="toggle-opt" id="profile-toggle-no">
+                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                    No membership
+                  </button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FITNESS & HEALTH -->
+          <div class="profile-form-section-label">Fitness &amp; Health</div>
+          <div class="card profile-form-card">
+
+            <div class="profile-field">
+              <label class="profile-label" for="profile-fitness-goal">Fitness or health goal</label>
+              <input type="text" id="profile-fitness-goal" class="text-input" placeholder="e.g. lose 10 lbs, build muscle, eat cleaner, low sodium..." maxlength="120">
+              <div class="profile-field-hint">Pre-fills your planner each session so you don't have to re-type it</div>
+            </div>
+
+            <div class="profile-field" style="margin-bottom:0">
+              <label class="profile-label">Health concerns &amp; dietary restrictions</label>
+              <div class="profile-check-chips">
+                <label class="check-chip"><input type="checkbox" name="health" value="dairy-free"> Dairy-free</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="gluten-free"> Gluten-free</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="vegetarian"> Vegetarian</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="vegan"> Vegan</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="nut-allergy"> Nut allergy</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="low-sodium"> Low sodium</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="diabetic"> Diabetic-friendly</label>
+                <label class="check-chip"><input type="checkbox" name="health" value="low-carb"> Low carb</label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- FOOD PREFERENCES -->
+          <div class="profile-form-section-label">Food Preferences</div>
+          <div class="card profile-form-card">
+
+            <div class="profile-field">
+              <label class="profile-label" for="profile-fav-foods">Foods you love</label>
+              <input type="text" id="profile-fav-foods" class="text-input" placeholder="e.g. salmon, avocado, pasta, berries, Greek yogurt..." maxlength="200">
+            </div>
+
+            <div class="profile-field">
+              <label class="profile-label" for="profile-disliked-foods">Foods you avoid or dislike</label>
+              <input type="text" id="profile-disliked-foods" class="text-input" placeholder="e.g. mushrooms, cilantro, liver..." maxlength="200">
+            </div>
+
+            <div class="profile-field" style="margin-bottom:0">
+              <label class="profile-label">Cuisines you enjoy</label>
+              <div class="profile-check-chips">
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="American"> American</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Italian"> Italian</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Mexican"> Mexican</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Asian"> Asian</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Mediterranean"> Mediterranean</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Indian"> Indian</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Thai"> Thai</label>
+                <label class="check-chip"><input type="checkbox" name="cuisine" value="Greek"> Greek</label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SHOPPING STYLE -->
+          <div class="profile-form-section-label">Shopping Style</div>
+          <div class="card profile-form-card">
+
+            <div class="profile-field">
+              <label class="profile-label">Budget style</label>
+              <div class="profile-radio-group">
+                <label class="radio-chip">
+                  <input type="radio" name="budget-style" value="economy">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Economy</span>
+                    <span class="radio-chip-sub">Stretch every dollar</span>
+                  </span>
+                </label>
+                <label class="radio-chip">
+                  <input type="radio" name="budget-style" value="balanced">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Balanced</span>
+                    <span class="radio-chip-sub">Quality at fair prices</span>
+                  </span>
+                </label>
+                <label class="radio-chip">
+                  <input type="radio" name="budget-style" value="premium">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Premium</span>
+                    <span class="radio-chip-sub">Best quality, less price sensitivity</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+            <div class="profile-field" style="margin-bottom:0">
+              <label class="profile-label">How often do you shop?</label>
+              <div class="profile-radio-group">
+                <label class="radio-chip">
+                  <input type="radio" name="shop-frequency" value="weekly">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Weekly</span>
+                  </span>
+                </label>
+                <label class="radio-chip">
+                  <input type="radio" name="shop-frequency" value="biweekly">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Every 2 weeks</span>
+                  </span>
+                </label>
+                <label class="radio-chip">
+                  <input type="radio" name="shop-frequency" value="monthly">
+                  <span class="radio-chip-inner">
+                    <span class="radio-chip-title">Monthly</span>
+                  </span>
+                </label>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- SAVE -->
+          <div class="profile-save-row">
+            <button class="btn-generate" id="save-profile-btn">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Profile
+            </button>
+            <span class="profile-saved-badge" id="profile-saved-badge" style="display:none">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+              Saved!
+            </span>
+          </div>
+
+          <!-- PLANNING HISTORY -->
+          <div class="profile-form-section-label profile-history-label">
+            Planning History
+            <button class="btn-clear-history" id="clear-history-btn">Clear history</button>
+          </div>
+          <div id="profile-history-empty" class="profile-history-empty" style="display:none">
+            No planning history yet. Go to the <button class="btn-inline-link" data-goto-tab="goals">Planner</button> to get started.
+          </div>
+          <div id="profile-history-list" class="profile-history-list"></div>
+
+        </section>
+      </div>
+    </main>
+
+  </div><!-- /tab-profile -->
 
 
   <footer class="site-footer">

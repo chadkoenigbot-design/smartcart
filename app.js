@@ -1048,6 +1048,244 @@ function generateInsights(analysis, householdSize, locationInfo, hasMembership) 
   return insights.slice(0, 4);
 }
 
+// ─── PROFILE ─────────────────────────────────────────────────────────────────
+
+const PROFILE_KEY = 'smartcart_profile';
+const HISTORY_KEY = 'smartcart_planner_history';
+
+function getProfile() {
+  try { return JSON.parse(localStorage.getItem(PROFILE_KEY) || 'null'); } catch (e) { return null; }
+}
+
+function saveProfile(data) {
+  localStorage.setItem(PROFILE_KEY, JSON.stringify(data));
+}
+
+function defaultProfile() {
+  return {
+    name: '', householdSize: 2, zip: '', hasMembership: true,
+    fitnessGoal: '', healthConcerns: [], favoriteFoods: '',
+    dislikedFoods: '', cuisines: [], budgetStyle: 'balanced', shoppingFrequency: 'weekly',
+  };
+}
+
+function readProfileForm() {
+  const profile = defaultProfile();
+  profile.name              = (document.getElementById('profile-name')?.value || '').trim();
+  profile.zip               = (document.getElementById('profile-zip')?.value || '').trim();
+  profile.fitnessGoal       = (document.getElementById('profile-fitness-goal')?.value || '').trim();
+  profile.favoriteFoods     = (document.getElementById('profile-fav-foods')?.value || '').trim();
+  profile.dislikedFoods     = (document.getElementById('profile-disliked-foods')?.value || '').trim();
+  profile.hasMembership     = document.getElementById('profile-toggle-yes')?.classList.contains('active') ?? true;
+  profile.budgetStyle       = document.querySelector('input[name="budget-style"]:checked')?.value || 'balanced';
+  profile.shoppingFrequency = document.querySelector('input[name="shop-frequency"]:checked')?.value || 'weekly';
+  const activeSize = document.querySelector('#profile-size-picker .size-btn.active');
+  profile.householdSize     = activeSize ? parseInt(activeSize.dataset.val, 10) || 2 : 2;
+  profile.healthConcerns    = Array.from(document.querySelectorAll('input[name="health"]:checked')).map(c => c.value);
+  profile.cuisines          = Array.from(document.querySelectorAll('input[name="cuisine"]:checked')).map(c => c.value);
+  return profile;
+}
+
+function populateProfileForm(profile) {
+  if (!profile) return;
+  const setVal = (id, v) => { const el = document.getElementById(id); if (el) el.value = v || ''; };
+  setVal('profile-name', profile.name);
+  setVal('profile-zip', profile.zip);
+  setVal('profile-fitness-goal', profile.fitnessGoal);
+  setVal('profile-fav-foods', profile.favoriteFoods);
+  setVal('profile-disliked-foods', profile.dislikedFoods);
+
+  // Household size picker
+  document.querySelectorAll('#profile-size-picker .size-btn').forEach(btn => {
+    btn.classList.toggle('active', parseInt(btn.dataset.val, 10) === (profile.householdSize || 2));
+  });
+
+  // Membership toggles
+  const hs = profile.hasMembership !== false;
+  document.getElementById('profile-toggle-yes')?.classList.toggle('active', hs);
+  document.getElementById('profile-toggle-no')?.classList.toggle('active', !hs);
+
+  // Budget style
+  const budgetRadio = document.querySelector(`input[name="budget-style"][value="${profile.budgetStyle || 'balanced'}"]`);
+  if (budgetRadio) budgetRadio.checked = true;
+
+  // Shopping frequency
+  const freqRadio = document.querySelector(`input[name="shop-frequency"][value="${profile.shoppingFrequency || 'weekly'}"]`);
+  if (freqRadio) freqRadio.checked = true;
+
+  // Health concerns
+  document.querySelectorAll('input[name="health"]').forEach(cb => {
+    cb.checked = (profile.healthConcerns || []).includes(cb.value);
+  });
+
+  // Cuisines
+  document.querySelectorAll('input[name="cuisine"]').forEach(cb => {
+    cb.checked = (profile.cuisines || []).includes(cb.value);
+  });
+}
+
+function renderProfileGreeting() {
+  const profile = getProfile();
+  const name = profile?.name?.trim() || '';
+  const chip = document.getElementById('header-profile-chip');
+  const nameEl = document.getElementById('header-profile-name');
+  const avatarEl = document.getElementById('header-profile-avatar');
+  const heroNameEl = document.getElementById('profile-tab-hero-name');
+  const avatarTabEl = document.getElementById('profile-tab-avatar');
+  const navLabel = document.getElementById('nav-profile-label');
+
+  if (name) {
+    const initial = name.charAt(0).toUpperCase();
+    if (chip) chip.style.display = 'flex';
+    if (nameEl) nameEl.textContent = 'Hi, ' + name.split(' ')[0];
+    if (avatarEl) { avatarEl.innerHTML = initial; }
+    if (heroNameEl) heroNameEl.textContent = name + "'s Profile";
+    if (avatarTabEl) { avatarTabEl.textContent = initial; }
+    if (navLabel) navLabel.textContent = name.split(' ')[0].slice(0, 8);
+  } else {
+    if (chip) chip.style.display = 'none';
+    if (heroNameEl) heroNameEl.textContent = 'Your Profile';
+    if (avatarTabEl) {
+      avatarTabEl.innerHTML = '<svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>';
+    }
+    if (navLabel) navLabel.textContent = 'Profile';
+  }
+}
+
+function syncProfileToState(profile) {
+  if (!profile) return;
+  if (profile.householdSize) {
+    state.householdSize = profile.householdSize;
+    document.querySelectorAll('#size-picker .size-btn').forEach(btn => {
+      btn.classList.toggle('active', parseInt(btn.dataset.val, 10) === profile.householdSize);
+    });
+    const hintEl = document.getElementById('size-hint-text');
+    if (hintEl) {
+      const hints = {
+        1: 'Solo shopper — warehouse bulk is rarely worth it for perishables.',
+        2: 'Small household — fresh produce and perishables usually best bought locally.',
+        3: 'Medium household — a good mix of warehouse and local shopping.',
+        4: 'Growing household — most bulk items start making great sense.',
+        5: 'Large household — warehouse club is almost always the better choice.',
+        6: 'Big household — warehouse club delivers outstanding value across the board.',
+      };
+      hintEl.textContent = hints[profile.householdSize] || hints[2];
+    }
+  }
+  if (profile.zip) {
+    state.zip = profile.zip;
+    const zipInput = document.getElementById('zip-input');
+    if (zipInput && !zipInput.value) zipInput.value = profile.zip;
+    // Trigger location lookup if input is empty and profile has zip
+    if (zipInput && zipInput.value === profile.zip) zipInput.dispatchEvent(new Event('input'));
+  }
+  if (typeof profile.hasMembership === 'boolean') {
+    state.hasMembership = profile.hasMembership;
+    document.getElementById('toggle-yes')?.classList.toggle('active', profile.hasMembership);
+    document.getElementById('toggle-no')?.classList.toggle('active', !profile.hasMembership);
+    const noteEl = document.getElementById('membership-note');
+    if (noteEl) noteEl.textContent = profile.hasMembership
+      ? 'Costco: ~$65/yr\u00a0\u00a0•\u00a0\u00a0Sam\'s Club: ~$50/yr'
+      : 'No membership fee factored in';
+  }
+}
+
+function renderProfileGoalHint() {
+  const profile = getProfile();
+  const hint = document.getElementById('profile-goal-hint');
+  const hintText = document.getElementById('profile-goal-hint-text');
+  if (!hint) return;
+  if (profile?.fitnessGoal) {
+    const truncated = profile.fitnessGoal.length > 60 ? profile.fitnessGoal.slice(0, 60) + '…' : profile.fitnessGoal;
+    if (hintText) hintText.textContent = 'Your saved goal: ' + truncated;
+    hint.style.display = 'flex';
+  } else {
+    hint.style.display = 'none';
+  }
+}
+
+// ─── PLANNER HISTORY ─────────────────────────────────────────────────────────
+
+function getPlannerHistory() {
+  try { return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]'); } catch (e) { return []; }
+}
+
+function savePlannerHistory() {
+  if (plannerThread.length === 0) return;
+  const history = getPlannerHistory();
+  const entry = {
+    id: Date.now().toString(),
+    date: new Date().toISOString(),
+    goalText: plannerThread[0]?.userMsg || '',
+    headline: plannerThread[0]?.label || '',
+    turns: plannerThread.length,
+    thread: plannerThread.map(t => ({ ...t })),
+  };
+  history.unshift(entry);
+  // Keep last 20 sessions
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history.slice(0, 20)));
+}
+
+function loadLastPlannerSession() {
+  const history = getPlannerHistory();
+  if (!history.length) return;
+  const last = history[0];
+  if (!last.thread || !last.thread.length) return;
+  plannerThread = last.thread;
+  renderPlannerThread();
+  // Show update-wish section if we restored a session
+  const updateWishEl = el('update-wish-section');
+  if (updateWishEl) updateWishEl.style.display = '';
+}
+
+function renderProfileHistory() {
+  const history = getPlannerHistory();
+  const listEl = document.getElementById('profile-history-list');
+  const emptyEl = document.getElementById('profile-history-empty');
+  if (!listEl || !emptyEl) return;
+
+  if (!history.length) {
+    emptyEl.style.display = '';
+    listEl.innerHTML = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+
+  listEl.innerHTML = history.map(entry => {
+    const d = new Date(entry.date);
+    const dateStr = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const timeStr = d.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+    const goalTrunc = entry.goalText.length > 100 ? entry.goalText.slice(0, 100) + '…' : entry.goalText;
+    return `<div class="history-item" data-history-id="${escHtml(entry.id)}">
+      <div class="history-item-header">
+        <div class="history-item-meta">
+          <span class="history-item-date">${escHtml(dateStr)} at ${escHtml(timeStr)}</span>
+          ${entry.headline ? `<span class="history-item-badge">${escHtml(entry.headline)}</span>` : ''}
+        </div>
+        <button class="history-item-btn btn-resume-session" data-history-id="${escHtml(entry.id)}">Resume →</button>
+      </div>
+      <div class="history-item-goal">"${escHtml(goalTrunc)}"</div>
+      <div class="history-item-turns">${entry.turns} planning turn${entry.turns !== 1 ? 's' : ''}</div>
+    </div>`;
+  }).join('');
+
+  listEl.querySelectorAll('.btn-resume-session').forEach(btn => {
+    btn.addEventListener('click', () => resumeSession(btn.dataset.historyId));
+  });
+}
+
+function resumeSession(id) {
+  const history = getPlannerHistory();
+  const entry = history.find(h => h.id === id);
+  if (!entry || !entry.thread) return;
+  plannerThread = entry.thread;
+  renderPlannerThread();
+  const updateWishEl = el('update-wish-section');
+  if (updateWishEl) updateWishEl.style.display = '';
+  switchTab('goals');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
 // ─── EVENT WIRING ─────────────────────────────────────────────────────────
 
 // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
@@ -1063,6 +1301,7 @@ function switchTab(tabName) {
   const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
   if (tabName === 'saved') renderSavedLists();
+  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2104,6 +2343,9 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!text) { document.getElementById('goal-input')?.focus(); return; }
     const goal = parseGoal(text);
 
+    // Save previous session to history before resetting
+    savePlannerHistory();
+
     // Reset thread on each new plan
     plannerThread = [];
     plannerThread.push({
@@ -2177,6 +2419,73 @@ document.addEventListener('DOMContentLoaded', () => {
     if (e.key === 'Enter') handleUpdateWish();
   });
 
+  // ── Profile tab — household size picker
+  document.querySelectorAll('#profile-size-picker .size-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#profile-size-picker .size-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+
+  // ── Profile tab — membership toggles
+  document.getElementById('profile-toggle-yes')?.addEventListener('click', () => {
+    document.getElementById('profile-toggle-yes')?.classList.add('active');
+    document.getElementById('profile-toggle-no')?.classList.remove('active');
+  });
+  document.getElementById('profile-toggle-no')?.addEventListener('click', () => {
+    document.getElementById('profile-toggle-no')?.classList.add('active');
+    document.getElementById('profile-toggle-yes')?.classList.remove('active');
+  });
+
+  // ── Profile tab — save profile button
+  document.getElementById('save-profile-btn')?.addEventListener('click', () => {
+    const profile = readProfileForm();
+    saveProfile(profile);
+    syncProfileToState(profile);
+    renderProfileGreeting();
+    renderProfileGoalHint();
+    const badge = document.getElementById('profile-saved-badge');
+    if (badge) {
+      badge.style.display = 'flex';
+      setTimeout(() => { badge.style.display = 'none'; }, 2500);
+    }
+    showToast('Profile saved!');
+  });
+
+  // ── Profile tab — clear history button
+  document.getElementById('clear-history-btn')?.addEventListener('click', () => {
+    if (confirm('Clear all planning history?')) {
+      localStorage.removeItem(HISTORY_KEY);
+      plannerThread = [];
+      renderPlannerThread();
+      renderProfileHistory();
+      const updateWishEl = el('update-wish-section');
+      if (updateWishEl) updateWishEl.style.display = 'none';
+      showToast('History cleared');
+    }
+  });
+
+  // ── Goals tab — profile hint bar
+  document.getElementById('profile-goal-hint-use')?.addEventListener('click', () => {
+    const profile = getProfile();
+    if (!profile?.fitnessGoal) return;
+    const input = document.getElementById('goal-input');
+    if (input) input.value = profile.fitnessGoal;
+    document.getElementById('profile-goal-hint')?.style && (document.getElementById('profile-goal-hint').style.display = 'none');
+    document.getElementById('generate-btn')?.click();
+  });
+  document.getElementById('profile-goal-hint-dismiss')?.addEventListener('click', () => {
+    const hint = document.getElementById('profile-goal-hint');
+    if (hint) hint.style.display = 'none';
+  });
+
   // ── Init
+  const savedProfile = getProfile();
+  if (savedProfile) {
+    syncProfileToState(savedProfile);
+  }
+  renderProfileGreeting();
+  renderProfileGoalHint();
+  loadLastPlannerSession();
   renderList();
 });
