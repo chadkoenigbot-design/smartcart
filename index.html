@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SmartCart — Smarter Grocery Shopping</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Header -->
+  <header class="header">
+    <div class="container">
+      <div class="header-inner">
+        <div class="logo">
+          <div class="logo-icon-wrap">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          </div>
+          <span class="logo-text">SmartCart</span>
+        </div>
+        <p class="header-tagline">Know exactly where to buy every item on your list.</p>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero -->
+  <div class="hero">
+    <div class="container">
+      <div class="hero-inner">
+        <div class="hero-badge">Free shopping optimizer</div>
+        <h1 class="hero-title">Stop guessing. Start saving.</h1>
+        <p class="hero-desc">Enter your grocery list and we'll tell you exactly which items belong in your warehouse club cart — and which are better bought locally. Get a complete basket strategy in seconds.</p>
+        <div class="hero-stats">
+          <div class="hero-stat"><strong>$600+</strong><span>avg. annual savings</span></div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat"><strong>60+</strong><span>items in our database</span></div>
+          <div class="hero-stat-divider"></div>
+          <div class="hero-stat"><strong>3 factors</strong><span>location, household size, perishability</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main -->
+  <main class="main">
+    <div class="container">
+
+      <!-- Section 1: Profile -->
+      <section class="section" id="section-profile">
+        <div class="section-header">
+          <div class="step-num">1</div>
+          <div class="section-header-text">
+            <h2 class="section-title">Your Shopping Profile</h2>
+            <p class="section-sub">We use this to tailor every recommendation to your household</p>
+          </div>
+        </div>
+
+        <div class="profile-grid">
+
+          <div class="card" id="card-household">
+            <div class="card-label-row">
+              <div class="card-icon-wrap card-icon-green">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Household Size</div>
+                <div class="card-sub">People in your home</div>
+              </div>
+            </div>
+            <div class="size-picker" id="size-picker">
+              <button class="size-btn" data-val="1">1</button>
+              <button class="size-btn active" data-val="2">2</button>
+              <button class="size-btn" data-val="3">3</button>
+              <button class="size-btn" data-val="4">4</button>
+              <button class="size-btn" data-val="5">5</button>
+              <button class="size-btn" data-val="6">6+</button>
+            </div>
+            <div class="size-hint" id="size-hint">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              <span id="size-hint-text">Small household — fresh produce and perishables usually best bought locally.</span>
+            </div>
+          </div>
+
+          <div class="card" id="card-location">
+            <div class="card-label-row">
+              <div class="card-icon-wrap card-icon-blue">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Your ZIP Code</div>
+                <div class="card-sub">For regional pricing estimates</div>
+              </div>
+            </div>
+            <div class="zip-input-wrap">
+              <input type="text" id="zip-input" class="text-input" placeholder="e.g. 10001" maxlength="5" inputmode="numeric" pattern="[0-9]*">
+              <div id="location-chip" class="location-chip" style="display:none">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                <span id="location-name">Suburban Area</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="card-membership">
+            <div class="card-label-row">
+              <div class="card-icon-wrap card-icon-amber">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+              </div>
+              <div>
+                <div class="card-title">Warehouse Membership</div>
+                <div class="card-sub">Affects your net savings</div>
+              </div>
+            </div>
+            <div class="membership-toggle">
+              <button class="toggle-opt active" id="toggle-yes" data-val="yes">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                I have one
+              </button>
+              <button class="toggle-opt" id="toggle-no" data-val="no">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+                I don't have one
+              </button>
+            </div>
+            <div class="membership-note" id="membership-note">Costco: ~$65/yr &nbsp;•&nbsp; Sam's Club: ~$50/yr</div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 2: Grocery List -->
+      <section class="section" id="section-list">
+        <div class="section-header">
+          <div class="step-num">2</div>
+          <div class="section-header-text">
+            <h2 class="section-title">Build Your Grocery List</h2>
+            <p class="section-sub">Add items you typically buy — we'll handle the comparison</p>
+          </div>
+        </div>
+
+        <div class="list-builder-layout">
+
+          <div class="add-item-panel card">
+            <div class="add-form-row">
+              <div class="add-form-group add-form-item">
+                <label class="form-label" for="item-input">Item</label>
+                <div class="autocomplete-container" id="autocomplete-container">
+                  <input type="text" id="item-input" class="text-input" placeholder="Search or type any item..." autocomplete="off">
+                  <div class="autocomplete-list" id="autocomplete-list" style="display:none"></div>
+                </div>
+              </div>
+              <div class="add-form-group add-form-qty">
+                <label class="form-label">Qty</label>
+                <div class="qty-row">
+                  <button class="qty-stepper" id="qty-minus" tabindex="-1">−</button>
+                  <input type="number" id="qty-input" class="qty-field" value="1" min="1" max="999">
+                  <button class="qty-stepper" id="qty-plus" tabindex="-1">+</button>
+                </div>
+              </div>
+              <div class="add-form-group add-form-unit">
+                <label class="form-label">Unit</label>
+                <div class="unit-pill" id="unit-pill">each</div>
+              </div>
+              <div class="add-form-group add-form-btn">
+                <label class="form-label">&nbsp;</label>
+                <button class="btn-add" id="add-btn">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                  Add Item
+                </button>
+              </div>
+            </div>
+
+            <div class="quick-row">
+              <span class="quick-label">Popular:</span>
+              <div class="quick-pills" id="quick-pills">
+                <button class="quick-pill" data-item="Eggs">Eggs</button>
+                <button class="quick-pill" data-item="Milk">Milk</button>
+                <button class="quick-pill" data-item="Chicken Breast">Chicken</button>
+                <button class="quick-pill" data-item="Olive Oil">Olive Oil</button>
+                <button class="quick-pill" data-item="Bananas">Bananas</button>
+                <button class="quick-pill" data-item="Paper Towels">Paper Towels</button>
+                <button class="quick-pill" data-item="Coffee">Coffee</button>
+                <button class="quick-pill" data-item="Almonds">Almonds</button>
+                <button class="quick-pill" data-item="Laundry Detergent">Detergent</button>
+                <button class="quick-pill" data-item="Salmon">Salmon</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Grocery List -->
+          <div class="list-area" id="list-area">
+            <div class="empty-list" id="empty-list">
+              <div class="empty-list-icon">
+                <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+              </div>
+              <div class="empty-list-title">Your list is empty</div>
+              <div class="empty-list-sub">Add items above to get started</div>
+            </div>
+            <div id="grocery-list" class="grocery-list" style="display:none">
+              <div class="list-header-row">
+                <span class="list-col-item">Item</span>
+                <span class="list-col-cat">Category</span>
+                <span class="list-col-qty">Qty</span>
+                <span class="list-col-actions"></span>
+              </div>
+              <div id="list-items"></div>
+              <div class="list-footer">
+                <span id="list-count">0 items</span>
+                <button class="btn-text-danger" id="clear-list-btn">Clear all</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Analyze CTA -->
+          <div class="analyze-cta" id="analyze-cta" style="display:none">
+            <div class="analyze-cta-inner">
+              <div class="analyze-text">
+                <div class="analyze-title">Ready to optimize your basket?</div>
+                <div class="analyze-sub">We'll compare prices and build your shopping strategy</div>
+              </div>
+              <button class="btn-analyze" id="analyze-btn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+                Analyze My List
+              </button>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- Section 3: Results -->
+      <section class="section" id="section-results" style="display:none">
+        <div class="section-header">
+          <div class="step-num step-num-accent">3</div>
+          <div class="section-header-text">
+            <h2 class="section-title">Your Shopping Strategy</h2>
+            <p class="section-sub" id="results-sub">Personalized recommendations for your household</p>
+          </div>
+          <button class="btn-edit-list" id="edit-list-btn">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>
+            Edit List
+          </button>
+        </div>
+
+        <!-- Loading state -->
+        <div class="analyzing-state" id="analyzing-state" style="display:none">
+          <div class="analyzing-spinner"></div>
+          <div class="analyzing-text">Analyzing your basket...</div>
+        </div>
+
+        <!-- Results Content -->
+        <div id="results-content" style="display:none">
+
+          <!-- Strategy Banner -->
+          <div class="strategy-banner" id="strategy-banner"></div>
+
+          <!-- Savings Overview -->
+          <div class="savings-overview" id="savings-overview"></div>
+
+          <!-- Item Recommendations -->
+          <div class="rec-section">
+            <div class="rec-section-header">
+              <h3 class="rec-section-title">Item-by-Item Breakdown</h3>
+              <div class="rec-legend">
+                <span class="legend-item legend-warehouse">
+                  <span class="legend-dot legend-dot-warehouse"></span>Warehouse Club
+                </span>
+                <span class="legend-item legend-local">
+                  <span class="legend-dot legend-dot-local"></span>Local Grocery
+                </span>
+              </div>
+            </div>
+            <div id="rec-items"></div>
+          </div>
+
+          <!-- Insights -->
+          <div class="insights-grid" id="insights-grid"></div>
+
+          <!-- Membership ROI (shown if no membership) -->
+          <div class="membership-roi" id="membership-roi" style="display:none"></div>
+
+        </div>
+
+        <div style="text-align:center;padding-top:24px;padding-bottom:8px">
+          <button class="btn-outline" id="start-over-btn">Start Over</button>
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-logo">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+          SmartCart
+        </div>
+        <p class="footer-note">Prices shown are representative estimates for educational purposes. Always verify current prices at your local stores. Savings vary by region, store, and item.</p>
+      </div>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
