@@ -3,17 +3,17 @@
 // ─── CATEGORY METADATA ─────────────────────────────────────────────────────
 
 const CATEGORIES = {
-  produce:   { name: 'Fresh Produce',        icon: '🥦', warehouseSuit: 'conditional', sizeThreshold: 4,  bulkWasteRisk: true,  note: 'Perishable — best in bulk only for larger households that consume quickly.' },
-  dairy:     { name: 'Dairy',                icon: '🥛', warehouseSuit: 'conditional', sizeThreshold: 3,  bulkWasteRisk: true,  note: 'Eggs and hard cheese last well; milk may be challenging in small households.' },
-  meat:      { name: 'Meat & Seafood',       icon: '🥩', warehouseSuit: 'high',        sizeThreshold: 2,  bulkWasteRisk: false, note: 'Excellent bulk value — portion into meals and freeze for later.' },
-  pantry:    { name: 'Pantry Staples',       icon: '🫙', warehouseSuit: 'high',        sizeThreshold: 1,  bulkWasteRisk: false, note: 'Non-perishable staples are almost always cheaper in bulk.' },
-  frozen:    { name: 'Frozen Foods',         icon: '🧊', warehouseSuit: 'high',        sizeThreshold: 1,  bulkWasteRisk: false, note: 'Frozen items store indefinitely — outstanding bulk value.' },
-  beverages: { name: 'Beverages',            icon: '☕', warehouseSuit: 'high',        sizeThreshold: 2,  bulkWasteRisk: false, note: 'Most beverages store well and see excellent per-unit bulk savings.' },
-  snacks:    { name: 'Snacks',               icon: '🍿', warehouseSuit: 'medium',      sizeThreshold: 3,  bulkWasteRisk: true,  note: 'Mixed — confirm expiration dates and realistic consumption rate.' },
-  cleaning:  { name: 'Cleaning & Household', icon: '🧹', warehouseSuit: 'high',        sizeThreshold: 1,  bulkWasteRisk: false, note: 'Household supplies offer some of the best and most consistent bulk savings.' },
-  personal:  { name: 'Personal Care',        icon: '🧴', warehouseSuit: 'high',        sizeThreshold: 1,  bulkWasteRisk: false, note: 'Personal care products store well and deliver strong bulk value.' },
-  bakery:    { name: 'Bread & Bakery',       icon: '🍞', warehouseSuit: 'low',         sizeThreshold: 5,  bulkWasteRisk: true,  note: 'Bread goes stale within days — local or freeze immediately after purchase.' },
-  specialty: { name: 'Specialty',            icon: '🌶️', warehouseSuit: 'low',         sizeThreshold: 6,  bulkWasteRisk: false, note: 'Better variety and freshness at specialty or local markets.' },
+  produce:   { name: 'Fresh Produce',        icon: '🥦', warehouseSuit: 'conditional', sizeThreshold: 3.5, bulkWasteRisk: true,  shelfDays: 5,  note: 'Perishable — depends heavily on household size and consumption rate.' },
+  dairy:     { name: 'Dairy',                icon: '🥛', warehouseSuit: 'conditional', sizeThreshold: 2.5, bulkWasteRisk: true,  shelfDays: 10, note: 'Eggs and hard cheese last well; fluid dairy is trickier for smaller households.' },
+  meat:      { name: 'Meat & Seafood',       icon: '🥩', warehouseSuit: 'high',        sizeThreshold: 1.5, bulkWasteRisk: false, shelfDays: 180,note: 'Excellent bulk value — portion and freeze. Lasts 4–6 months in the freezer.' },
+  pantry:    { name: 'Pantry Staples',       icon: '🫙', warehouseSuit: 'high',        sizeThreshold: 1,   bulkWasteRisk: false, shelfDays: 365,note: 'Non-perishable staples are almost always cheaper in bulk.' },
+  frozen:    { name: 'Frozen Foods',         icon: '🧊', warehouseSuit: 'high',        sizeThreshold: 1,   bulkWasteRisk: false, shelfDays: 365,note: 'Frozen items store indefinitely — outstanding bulk value for any household.' },
+  beverages: { name: 'Beverages',            icon: '☕', warehouseSuit: 'high',        sizeThreshold: 1.5, bulkWasteRisk: false, shelfDays: 365,note: 'Most beverages store well and see excellent per-unit bulk savings.' },
+  snacks:    { name: 'Snacks',               icon: '🍿', warehouseSuit: 'medium',      sizeThreshold: 2.5, bulkWasteRisk: true,  shelfDays: 30, note: 'Mixed — confirm expiration dates and realistic consumption rate.' },
+  cleaning:  { name: 'Cleaning & Household', icon: '🧹', warehouseSuit: 'high',        sizeThreshold: 1,   bulkWasteRisk: false, shelfDays: 730,note: 'Household supplies offer some of the best and most consistent bulk savings.' },
+  personal:  { name: 'Personal Care',        icon: '🧴', warehouseSuit: 'high',        sizeThreshold: 1,   bulkWasteRisk: false, shelfDays: 730,note: 'Personal care products store well and deliver strong bulk value.' },
+  bakery:    { name: 'Bread & Bakery',       icon: '🍞', warehouseSuit: 'low',         sizeThreshold: 5,   bulkWasteRisk: true,  shelfDays: 4,  note: 'Bread goes stale within days — buy local or freeze immediately after purchase.' },
+  specialty: { name: 'Specialty',            icon: '🌶️', warehouseSuit: 'low',         sizeThreshold: 6,   bulkWasteRisk: false, shelfDays: 90, note: 'Better variety and freshness at specialty or local markets.' },
 };
 
 // ─── ITEM CATALOG ──────────────────────────────────────────────────────────
@@ -157,13 +157,13 @@ const LOCATION_TIERS = {
     name: 'Midwest / South',
     localMultiplier: 0.92,
     warehouseMultiplier: 0.98,
-    description: 'Lower local grocery prices — warehouse advantage is moderate.',
+    description: 'Lower local grocery prices — warehouse advantage is moderate but still meaningful.',
   },
   rural: {
     name: 'Small Town / Rural',
     localMultiplier: 0.88,
-    warehouseMultiplier: 1.0,
-    description: 'Lower local prices and warehouse clubs may be farther — split strategy varies.',
+    warehouseMultiplier: 1.02,
+    description: 'Lower local prices; warehouse clubs may require a drive — weigh trip cost vs. savings.',
   },
 };
 
@@ -171,31 +171,51 @@ function getLocationTier(zip) {
   const z = parseInt(zip, 10);
   if (isNaN(z) || z < 100 || z > 99999) return { tier: LOCATION_TIERS.suburban, region: 'Unknown Location' };
 
-  // Major metros
-  if ((z >= 10001 && z <= 11999)) return { tier: LOCATION_TIERS.major_metro, region: 'New York Metro' };
-  if ((z >= 90001 && z <= 91999)) return { tier: LOCATION_TIERS.major_metro, region: 'Los Angeles' };
-  if ((z >= 94100 && z <= 94199)) return { tier: LOCATION_TIERS.major_metro, region: 'San Francisco' };
-  if ((z >= 94000 && z <= 94099) || (z >= 94200 && z <= 94999)) return { tier: LOCATION_TIERS.coastal_city, region: 'Bay Area' };
-  if ((z >= 2100  && z <= 2299))  return { tier: LOCATION_TIERS.major_metro, region: 'Boston' };
-  if ((z >= 98101 && z <= 98199)) return { tier: LOCATION_TIERS.major_metro, region: 'Seattle' };
-  if ((z >= 60601 && z <= 60699)) return { tier: LOCATION_TIERS.major_metro, region: 'Chicago' };
-  if ((z >= 20001 && z <= 20599)) return { tier: LOCATION_TIERS.major_metro, region: 'Washington D.C.' };
-  if ((z >= 33100 && z <= 33299)) return { tier: LOCATION_TIERS.major_metro, region: 'Miami' };
-  if ((z >= 77001 && z <= 77099)) return { tier: LOCATION_TIERS.coastal_city, region: 'Houston' };
-  if ((z >= 78201 && z <= 78299)) return { tier: LOCATION_TIERS.suburban,     region: 'San Antonio' };
-  if ((z >= 85001 && z <= 85099)) return { tier: LOCATION_TIERS.suburban,     region: 'Phoenix' };
-  if ((z >= 30301 && z <= 30399)) return { tier: LOCATION_TIERS.coastal_city, region: 'Atlanta' };
-  if ((z >= 80201 && z <= 80299)) return { tier: LOCATION_TIERS.coastal_city, region: 'Denver' };
-  if ((z >= 97201 && z <= 97299)) return { tier: LOCATION_TIERS.coastal_city, region: 'Portland' };
-  if ((z >= 19101 && z <= 19199)) return { tier: LOCATION_TIERS.coastal_city, region: 'Philadelphia' };
-  if ((z >= 21201 && z <= 21299)) return { tier: LOCATION_TIERS.suburban,     region: 'Baltimore' };
+  // Major metros (alphabetical)
+  if (z >= 10001 && z <= 11999)  return { tier: LOCATION_TIERS.major_metro, region: 'New York Metro' };
+  if (z >= 2100  && z <= 2299)   return { tier: LOCATION_TIERS.major_metro, region: 'Boston' };
+  if (z >= 20001 && z <= 20599)  return { tier: LOCATION_TIERS.major_metro, region: 'Washington D.C.' };
+  if (z >= 33100 && z <= 33299)  return { tier: LOCATION_TIERS.major_metro, region: 'Miami' };
+  if (z >= 60601 && z <= 60699)  return { tier: LOCATION_TIERS.major_metro, region: 'Chicago' };
+  if (z >= 90001 && z <= 91999)  return { tier: LOCATION_TIERS.major_metro, region: 'Los Angeles' };
+  if (z >= 94100 && z <= 94199)  return { tier: LOCATION_TIERS.major_metro, region: 'San Francisco' };
+  if (z >= 98101 && z <= 98199)  return { tier: LOCATION_TIERS.major_metro, region: 'Seattle' };
 
-  // Broad regional signals
+  // Coastal/above-average cities
+  if ((z >= 94000 && z <= 94099) || (z >= 94200 && z <= 94999))
+                                 return { tier: LOCATION_TIERS.coastal_city, region: 'Bay Area' };
+  if (z >= 19101 && z <= 19199)  return { tier: LOCATION_TIERS.coastal_city, region: 'Philadelphia' };
+  if (z >= 30301 && z <= 30399)  return { tier: LOCATION_TIERS.coastal_city, region: 'Atlanta' };
+  if (z >= 55401 && z <= 55499)  return { tier: LOCATION_TIERS.coastal_city, region: 'Minneapolis' };
+  if (z >= 70112 && z <= 70199)  return { tier: LOCATION_TIERS.coastal_city, region: 'New Orleans' };
+  if (z >= 77001 && z <= 77099)  return { tier: LOCATION_TIERS.coastal_city, region: 'Houston' };
+  if (z >= 80201 && z <= 80299)  return { tier: LOCATION_TIERS.coastal_city, region: 'Denver' };
+  if (z >= 89101 && z <= 89199)  return { tier: LOCATION_TIERS.coastal_city, region: 'Las Vegas' };
+  if (z >= 92101 && z <= 92199)  return { tier: LOCATION_TIERS.coastal_city, region: 'San Diego' };
+  if (z >= 97201 && z <= 97299)  return { tier: LOCATION_TIERS.coastal_city, region: 'Portland' };
+
+  // Suburban / slightly above average
+  if (z >= 21201 && z <= 21299)  return { tier: LOCATION_TIERS.suburban, region: 'Baltimore' };
+  if (z >= 28201 && z <= 28299)  return { tier: LOCATION_TIERS.suburban, region: 'Charlotte' };
+  if (z >= 43201 && z <= 43299)  return { tier: LOCATION_TIERS.suburban, region: 'Columbus' };
+  if (z >= 46201 && z <= 46299)  return { tier: LOCATION_TIERS.suburban, region: 'Indianapolis' };
+  if (z >= 73101 && z <= 73199)  return { tier: LOCATION_TIERS.suburban, region: 'Oklahoma City' };
+  if (z >= 78201 && z <= 78299)  return { tier: LOCATION_TIERS.suburban, region: 'San Antonio' };
+  if (z >= 85001 && z <= 85099)  return { tier: LOCATION_TIERS.suburban, region: 'Phoenix' };
+
+  // Midwest / South affordability belt
+  if (z >= 37201 && z <= 37299)  return { tier: LOCATION_TIERS.midwest_south, region: 'Nashville' };
+  if (z >= 63101 && z <= 63199)  return { tier: LOCATION_TIERS.midwest_south, region: 'St. Louis' };
+  if (z >= 75201 && z <= 75299)  return { tier: LOCATION_TIERS.midwest_south, region: 'Dallas' };
+  if (z >= 78701 && z <= 78799)  return { tier: LOCATION_TIERS.midwest_south, region: 'Austin' };
+
+  // Broad regional signals from first 1–2 digits
   const firstDigit = Math.floor(z / 10000);
   if (firstDigit === 0 || firstDigit === 1) return { tier: LOCATION_TIERS.coastal_city, region: 'Northeast' };
   if (firstDigit === 9)                     return { tier: LOCATION_TIERS.coastal_city, region: 'West Coast' };
   if (firstDigit === 4 || firstDigit === 5) return { tier: LOCATION_TIERS.midwest_south, region: 'Midwest' };
   if (firstDigit === 7)                     return { tier: LOCATION_TIERS.midwest_south, region: 'South' };
+  if (firstDigit === 8)                     return { tier: LOCATION_TIERS.suburban, region: 'Mountain West' };
 
   return { tier: LOCATION_TIERS.suburban, region: 'Suburban Area' };
 }
@@ -236,6 +256,35 @@ function findExactItem(name) {
 
 // ─── RECOMMENDATION ENGINE ────────────────────────────────────────────────
 
+// For perishables, estimate what fraction of a bulk purchase the household will
+// actually use before spoilage. 1.0 = uses it all, <1.0 = some waste expected.
+function bulkUtilization(reqQty, warehouseMin, householdSize, sizeThreshold) {
+  if (reqQty >= warehouseMin) return 1.0; // they need at least as much as warehouse min
+  const askRatio = reqQty / warehouseMin;  // fraction of min they actually asked for
+  const houseRatio = householdSize / sizeThreshold; // household capacity vs. ideal
+  // Blend: give weight to both the ask ratio and the household's natural consumption capacity
+  const capacityUtil = Math.min(1, houseRatio * 0.85);
+  return Math.min(1, Math.max(askRatio, capacityUtil));
+}
+
+// Continuous household suitability score (0–1).
+// Returns a score for how well this household can handle bulk buying in this category.
+function householdSuitabilityScore(householdSize, catMeta) {
+  return Math.min(1, householdSize / catMeta.sizeThreshold);
+}
+
+// Produce a human-readable recommendation label.
+function recLabel(rec, category, perUnitPct) {
+  if (rec === 'local') {
+    if (CATEGORIES[category].bulkWasteRisk) return 'Buy Fresh';
+    return 'Go Local';
+  }
+  if (category === 'meat') return 'Freeze & Stock';
+  if (category === 'frozen' || category === 'pantry') return perUnitPct > 0.4 ? 'Stock Up' : 'Buy in Bulk';
+  if (category === 'cleaning' || category === 'personal') return 'Stock Up';
+  return 'Buy in Bulk';
+}
+
 function analyzeItem(item, householdSize, locationInfo, hasMembership) {
   const catalogItem = findExactItem(item.name) || searchCatalog(item.name)[0];
   const category = catalogItem ? catalogItem.category : 'pantry';
@@ -258,62 +307,98 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
   const warehouseTotal = warehousePrice * warehouseQty;
 
   const perUnitSavings = localPrice - warehousePrice;
-  const perUnitPct = perUnitSavings / localPrice;
+  const perUnitPct = localPrice > 0 ? perUnitSavings / localPrice : 0;
 
-  // Determine recommendation
+  // ── Waste-adjusted effective warehouse price for perishables
+  let effectiveWarehousePerUnit = warehousePrice;
+  if (catMeta.bulkWasteRisk && warehouseQty > reqQty) {
+    const utilization = bulkUtilization(reqQty, warehouseQty, householdSize, catMeta.sizeThreshold);
+    // Effective cost = total spend divided by units actually used
+    effectiveWarehousePerUnit = (warehousePrice * warehouseQty) / (warehouseQty * utilization);
+  }
+  const effectiveWarehouseTotal = effectiveWarehousePerUnit * reqQty;
+
+  // ── Household suitability (continuous 0–1)
+  const householdScore = householdSuitabilityScore(householdSize, catMeta);
+
+  // ── Decision logic
   let rec = 'local';
   let confidence = 'high';
   let reasoning = '';
   let actualSavings = 0;
-
   const suit = catMeta.warehouseSuit;
 
-  if (suit === 'high') {
-    if (hasMembership || perUnitPct > 0.25) {
-      rec = 'warehouse';
-      const savingsOnQty = perUnitSavings * reqQty;
-      actualSavings = savingsOnQty;
-      reasoning = `Great bulk buy. You save ${fmt(perUnitSavings)} per ${unit} — ${Math.round(perUnitPct * 100)}% less than grocery store price.`;
-    } else {
-      rec = 'warehouse';
-      actualSavings = perUnitSavings * reqQty;
-      reasoning = `Still cheaper in bulk even without a membership. ${catMeta.note}`;
-    }
-  } else if (suit === 'medium' || suit === 'conditional') {
-    if (householdSize >= catMeta.sizeThreshold) {
-      rec = 'warehouse';
-      confidence = 'medium';
-      actualSavings = perUnitSavings * reqQty;
-      reasoning = `For a ${householdSize}-person household, bulk buying this perishable item makes sense. ${catMeta.note}`;
-    } else {
+  if (localPrice <= warehousePrice) {
+    // Edge case: local is actually cheaper in this region
+    rec = 'local';
+    actualSavings = 0;
+    reasoning = `Local stores in your area are actually competitive on this item — no bulk savings here.`;
+  } else if (suit === 'low') {
+    rec = 'local';
+    reasoning = catMeta.note;
+  } else if (suit === 'high') {
+    // High-suitability items: always warehouse unless waste makes it worse
+    if (catMeta.bulkWasteRisk && effectiveWarehouseTotal > localTotal * 1.05) {
+      // Waste penalty erases the savings
       rec = 'local';
+      reasoning = `Even though ${catMeta.name.toLowerCase()} is great in bulk for larger households, your household size means the warehouse minimum (${warehouseQty} ${unit}) may exceed what you'll use. Buying locally avoids potential waste.`;
       confidence = 'medium';
-      actualSavings = 0;
-      reasoning = `For smaller households, buying less at once reduces waste. ${catMeta.note}`;
+    } else {
+      rec = 'warehouse';
+      actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
+      if (perUnitPct >= 0.40) {
+        reasoning = `Outstanding bulk value — ${Math.round(perUnitPct * 100)}% cheaper per ${unit} vs. your local store. A clear win.`;
+      } else if (perUnitPct >= 0.25) {
+        reasoning = `Solid bulk savings at ${Math.round(perUnitPct * 100)}% less per ${unit}. ${catMeta.note}`;
+      } else {
+        reasoning = `Modestly cheaper in bulk (${Math.round(perUnitPct * 100)}% per ${unit}). ${catMeta.note}`;
+      }
+      confidence = perUnitPct >= 0.30 ? 'high' : 'medium';
     }
   } else {
-    // low suitability
-    rec = 'local';
-    actualSavings = 0;
-    reasoning = catMeta.note;
+    // conditional / medium — use continuous household score
+    if (householdScore >= 1.0) {
+      // Household meets or exceeds threshold — warehouse makes strong sense
+      if (catMeta.bulkWasteRisk && effectiveWarehouseTotal > localTotal * 1.05) {
+        rec = 'local';
+        reasoning = `Even with ${householdSize} people, the warehouse minimum on this perishable item may create waste. Buy locally for better value.`;
+        confidence = 'medium';
+      } else {
+        rec = 'warehouse';
+        actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
+        reasoning = `With ${householdSize} people, you'll move through this before it spoils. ${Math.round(perUnitPct * 100)}% savings per ${unit} — warehouse recommended.`;
+        confidence = 'high';
+      }
+    } else if (householdScore >= 0.65) {
+      // Close to threshold — warehouse works if waste-adjusted price is still good
+      if (catMeta.bulkWasteRisk && effectiveWarehouseTotal <= localTotal * 1.10) {
+        rec = 'warehouse';
+        actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
+        reasoning = `${householdSize}-person household is slightly below the ideal threshold for bulk ${catMeta.name.toLowerCase()}, but the savings (${Math.round(perUnitPct * 100)}%/unit) are strong enough to recommend it. Use before it spoils.`;
+        confidence = 'medium';
+      } else {
+        rec = 'local';
+        reasoning = `For ${householdSize} people, warehouse quantities of this perishable item carry waste risk that could offset the savings. Buy fresh locally.`;
+        confidence = 'medium';
+      }
+    } else {
+      // Small household relative to threshold
+      if (!catMeta.bulkWasteRisk && perUnitPct >= 0.30) {
+        // Non-perishable with strong savings — still warehouse
+        rec = 'warehouse';
+        actualSavings = Math.max(0, (localPrice - warehousePrice) * reqQty);
+        reasoning = `Item stores well even in smaller households. ${Math.round(perUnitPct * 100)}% per-unit savings make it worth stocking up.`;
+        confidence = 'medium';
+      } else {
+        rec = 'local';
+        reasoning = `For a ${householdSize}-person household, buying this in bulk risks waste or storage issues. ${catMeta.note}`;
+        confidence = householdScore >= 0.4 ? 'medium' : 'high';
+      }
+    }
   }
 
-  // Edge case: if you'd have to buy WAY more than needed at warehouse, warn
-  let wasteWarning = null;
-  if (rec === 'warehouse' && warehouseQty > reqQty * 3 && catMeta.bulkWasteRisk) {
-    wasteWarning = `⚠️ Warehouse requires buying ${warehouseQty} ${unit} — you only need ${reqQty}. Consider local to avoid waste.`;
-    rec = 'local';
-    actualSavings = 0;
-    reasoning = wasteWarning;
-    confidence = 'medium';
-  }
-
-  // Cannot save if local is already cheaper (edge case in some regions)
-  if (localPrice <= warehousePrice) {
-    rec = 'local';
-    actualSavings = 0;
-    reasoning = `Local stores are competitively priced for this item in your region.`;
-  }
+  // ── Compute label
+  const label = recLabel(rec, category, perUnitPct);
 
   return {
     name: item.name,
@@ -327,13 +412,15 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
     warehouseQty,
     warehouseMin,
     localTotal,
-    warehouseTotal: warehousePrice * reqQty, // compare apples-to-apples on same qty
-    warehouseTotalMin: warehouseTotal,        // actual min purchase at warehouse
+    warehouseTotal: warehousePrice * reqQty, // same-quantity comparison
+    warehouseTotalMin: warehouseTotal,         // actual minimum warehouse spend
     rec,
+    recLabel: label,
     confidence,
     actualSavings: Math.max(0, actualSavings),
     reasoning,
     perUnitPct,
+    householdScore,
   };
 }
 
@@ -341,7 +428,7 @@ function analyzeBasket(items, householdSize, locationInfo, hasMembership) {
   const results = items.map(item => analyzeItem(item, householdSize, locationInfo, hasMembership));
 
   let localTotal = 0;
-  let warehouseTotal = 0; // if everything warehouse
+  let warehouseTotal = 0;
   let optimizedTotal = 0;
   let warehouseSavings = 0;
   let warehouseItemCount = 0;
@@ -362,17 +449,25 @@ function analyzeBasket(items, householdSize, locationInfo, hasMembership) {
 
   // Overall strategy
   let strategy = 'split';
-  const warehousePct = warehouseItemCount / results.length;
+  const warehousePct = results.length > 0 ? warehouseItemCount / results.length : 0;
   if (warehousePct >= 0.75) strategy = 'warehouse';
   else if (warehousePct <= 0.25) strategy = 'local';
 
-  // Membership note
+  // Trip-worth-it: is the warehouse trip financially justified?
+  // Threshold: ~$12 savings or 3+ items — below this, separate trip may not make sense
+  const TRIP_MIN_SAVINGS = 12;
+  const TRIP_MIN_ITEMS = 3;
+  const tripWorthIt = warehouseItemCount >= TRIP_MIN_ITEMS || warehouseSavings >= TRIP_MIN_SAVINGS;
+
+  // Membership payback
   const MEMBERSHIP_COST_PER_YEAR = 65;
-  const annualSavingsEstimate = warehouseSavings * 52; // weekly shop
+  const annualSavingsEstimate = warehouseSavings * 52;
   const payoffMonths = MEMBERSHIP_COST_PER_YEAR / (warehouseSavings > 0 ? (warehouseSavings * 4.33) : 1);
 
   return {
     items: results,
+    warehouseItems: results.filter(r => r.rec === 'warehouse'),
+    localItems: results.filter(r => r.rec !== 'warehouse'),
     localTotal,
     warehouseTotal,
     optimizedTotal,
@@ -383,6 +478,7 @@ function analyzeBasket(items, householdSize, locationInfo, hasMembership) {
     totalItems: results.length,
     annualSavingsEstimate,
     payoffMonths: Math.ceil(payoffMonths),
+    tripWorthIt,
   };
 }
 
@@ -541,14 +637,68 @@ const STRATEGY_CONFIG = {
   },
 };
 
-const STRATEGY_DESCS = {
-  warehouse: (r, region) =>
-    `Most items on your list are great in bulk. For a ${r.totalItems}-item list in ${region}, heading to a warehouse club (Costco, Sam's Club, BJ's) for your major shop makes strong financial sense.`,
-  local: (r, region) =>
-    `Your list is heavy on perishables and smaller quantities. For your household in ${region}, a local grocery store or market will serve you better — less waste, fresher produce, and comparable cost.`,
-  split: (r, region) =>
-    `Your list has a mix of bulk-friendly and perishable items. The smartest move: buy ${r.warehouseItemCount} non-perishable or large-quantity items at a warehouse club, and pick up the remaining ${r.localItemCount} fresh items locally.`,
-};
+function strategyDesc(strategy, r, region) {
+  const savingsNote = r.warehouseSavings > 0
+    ? ` You'll save <strong>${fmt(r.warehouseSavings)}</strong> on this trip vs. buying everything locally.`
+    : '';
+  const annualNote = r.annualSavingsEstimate > 50
+    ? ` At this pace, that's ~<strong>${fmt(r.annualSavingsEstimate)}</strong>/year.`
+    : '';
+  if (strategy === 'warehouse') {
+    return `Most items on your ${r.totalItems}-item list are great in bulk. For ${region}, heading to a warehouse club (Costco, Sam's Club, BJ's) for your major shop makes strong financial sense.${savingsNote}${annualNote}`;
+  }
+  if (strategy === 'local') {
+    return `Your list is heavy on perishables and fresh items. For your household in ${region}, a local grocery store will serve you better — less waste, fresher produce, and comparable or lower cost.`;
+  }
+  return `Your list mixes bulk-friendly staples with perishable fresh items. The smartest move: buy <strong>${r.warehouseItemCount} item${r.warehouseItemCount !== 1 ? 's' : ''}</strong> at a warehouse club and pick up the remaining <strong>${r.localItemCount}</strong> fresh items locally.${savingsNote}${annualNote}`;
+}
+
+function buildRecItemHTML(r) {
+  const bg = catBg(r.category);
+  const col = catColor(r.category);
+
+  const isWarehouse = r.rec === 'warehouse';
+  const badgeClass = isWarehouse ? 'rec-badge-warehouse' : 'rec-badge-local';
+  const badgeIcon = isWarehouse
+    ? `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`
+    : `<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>`;
+
+  const localPillClass  = !isWarehouse ? ' price-pill-selected' : '';
+  const warehousePillClass = isWarehouse ? ' price-pill-selected' : '';
+  const savingsHTML = r.actualSavings > 0.01
+    ? `<span class="savings-chip">Save ${fmt(r.actualSavings)}</span>`
+    : `<span class="no-savings-chip">—</span>`;
+  const pctNote = r.actualSavings > 0.01
+    ? `<span class="savings-pct">${Math.round(r.perUnitPct * 100)}% off/unit</span>` : '';
+
+  return `<div class="rec-item">
+    <div class="rec-item-icon" style="background:${bg};color:${col}">${r.catMeta.icon}</div>
+    <div class="rec-item-body">
+      <div class="rec-item-name">
+        ${r.catalogName}
+        <small>× ${r.localQty} ${r.unit}</small>
+      </div>
+      <div class="rec-item-reasoning">${r.reasoning}</div>
+      <div class="price-compare-row">
+        <span class="price-pill price-pill-local${localPillClass}">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          Local: ${fmt(r.localTotal)}
+        </span>
+        <span class="price-vs">vs</span>
+        <span class="price-pill price-pill-warehouse${warehousePillClass}">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/></svg>
+          Warehouse: ${fmt(r.warehouseTotal)}
+        </span>
+        ${r.unit !== 'each' ? `<span class="price-vs">${fmt(r.localPrice)} vs ${fmt(r.warehousePrice)} / ${r.unit}</span>` : ''}
+      </div>
+    </div>
+    <div class="rec-item-right">
+      <span class="rec-badge ${badgeClass}">${badgeIcon} ${r.recLabel}</span>
+      ${savingsHTML}
+      ${pctNote}
+    </div>
+  </div>`;
+}
 
 function renderResults(analysis) {
   const region = state.locationInfo.region;
@@ -559,6 +709,7 @@ function renderResults(analysis) {
     ? `<div class="strategy-savings-badge">
         <div class="strategy-savings-amount">${fmt(analysis.warehouseSavings)}</div>
         <div class="strategy-savings-label">saved this trip</div>
+        ${analysis.annualSavingsEstimate > 50 ? `<div class="strategy-savings-annual">~${fmt(analysis.annualSavingsEstimate)}/yr</div>` : ''}
        </div>`
     : '';
   el('strategy-banner').className = `strategy-banner ${cfg.cls}`;
@@ -567,7 +718,7 @@ function renderResults(analysis) {
     <div class="strategy-text">
       <div class="strategy-label">${cfg.label}</div>
       <div class="strategy-headline">${cfg.headline}</div>
-      <div class="strategy-desc">${STRATEGY_DESCS[analysis.strategy](analysis, region)}</div>
+      <div class="strategy-desc">${strategyDesc(analysis.strategy, analysis, region)}</div>
     </div>
     ${savingsDisplay}
   `;
@@ -577,7 +728,7 @@ function renderResults(analysis) {
   const allW = fmt(analysis.warehouseTotal);
   const allL = fmt(analysis.localTotal);
   const optT = fmt(analysis.optimizedTotal);
-  const stratLabel = { warehouse: 'Warehouse Only', local: 'Local Only', split: 'Optimized (Split)' };
+  const stratLabel = { warehouse: 'Warehouse Only', local: 'Local Only', split: 'Optimized Split' };
   const winnerClass = analysis.warehouseSavings > 0 ? 'winner' : '';
 
   el('savings-overview').innerHTML = `
@@ -614,7 +765,7 @@ function renderResults(analysis) {
         ${stratLabel[analysis.strategy]}
       </div>
       <div class="cost-card-amount">${optT}</div>
-      <div class="cost-card-sub">${analysis.warehouseSavings > 0 ? `You save ${fmt(analysis.warehouseSavings)} vs. all local` : 'Comparable to all-local pricing'}</div>
+      <div class="cost-card-sub">${analysis.warehouseSavings > 0 ? `Saves ${fmt(analysis.warehouseSavings)} vs. all local` : 'Comparable to all-local pricing'}</div>
       <div class="cost-bar-row">
         <div class="cost-bar-track">
           <div class="cost-bar-fill optimized" style="width:${(analysis.optimizedTotal/maxCost*100).toFixed(1)}%"></div>
@@ -623,54 +774,55 @@ function renderResults(analysis) {
     </div>
   `;
 
-  // Item list
-  const recHTML = analysis.items.map(r => {
-    const bg = catBg(r.category);
-    const col = catColor(r.category);
-    const badge = r.rec === 'warehouse'
-      ? `<span class="rec-badge rec-badge-warehouse"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg> Warehouse</span>`
-      : r.rec === 'either'
-      ? `<span class="rec-badge rec-badge-either">Either Works</span>`
-      : `<span class="rec-badge rec-badge-local"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg> Local Store</span>`;
+  // ── Item breakdown — grouped by recommendation
+  let recHTML = '';
 
-    const savings = r.actualSavings > 0.01
-      ? `<span class="savings-chip">Save ${fmt(r.actualSavings)}</span>`
-      : `<span class="no-savings-chip">—</span>`;
-
-    const localPillClass  = r.rec !== 'warehouse' ? ' price-pill-selected' : '';
-    const warehousePillClass = r.rec === 'warehouse' ? ' price-pill-selected' : '';
-
-    return `<div class="rec-item">
-      <div class="rec-item-icon" style="background:${bg};color:${col}">${r.catMeta.icon}</div>
-      <div class="rec-item-body">
-        <div class="rec-item-name">
-          ${r.catalogName}
-          <small>× ${r.localQty} ${r.unit}</small>
+  if (analysis.warehouseItems.length > 0) {
+    recHTML += `
+      <div class="rec-group-header rec-group-header-warehouse">
+        <div class="rec-group-header-left">
+          <span class="rec-group-store-icon">🏬</span>
+          <span class="rec-group-title">Buy at Warehouse Club</span>
         </div>
-        <div class="rec-item-reasoning">${r.reasoning}</div>
-        <div class="price-compare-row">
-          <span class="price-pill price-pill-local${localPillClass}">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-            Local: ${fmt(r.localTotal)}
-          </span>
-          <span class="price-vs">vs</span>
-          <span class="price-pill price-pill-warehouse${warehousePillClass}">
-            <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/></svg>
-            Warehouse: ${fmt(r.warehouseTotal)}
-          </span>
-          ${r.unit !== 'each' ? `<span class="price-vs">(${fmt(r.localPrice)} vs ${fmt(r.warehousePrice)} / ${r.unit})</span>` : ''}
+        <span class="rec-group-count">${analysis.warehouseItems.length} item${analysis.warehouseItems.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${analysis.warehouseItems.map(buildRecItemHTML).join('')}
+    `;
+  }
+
+  if (analysis.localItems.length > 0) {
+    if (analysis.warehouseItems.length > 0) {
+      recHTML += `<div class="rec-group-divider"></div>`;
+    }
+    recHTML += `
+      <div class="rec-group-header rec-group-header-local">
+        <div class="rec-group-header-left">
+          <span class="rec-group-store-icon">🏪</span>
+          <span class="rec-group-title">Buy at Local Grocery</span>
+        </div>
+        <span class="rec-group-count">${analysis.localItems.length} item${analysis.localItems.length !== 1 ? 's' : ''}</span>
+      </div>
+      ${analysis.localItems.map(buildRecItemHTML).join('')}
+    `;
+  }
+
+  // Trip-worth-it note (when warehouse savings are modest)
+  if (analysis.warehouseItems.length > 0 && !analysis.tripWorthIt) {
+    recHTML += `
+      <div class="trip-threshold-alert">
+        <div class="trip-threshold-icon">🚗</div>
+        <div class="trip-threshold-text">
+          <strong>Trip check:</strong> Your warehouse savings total ${fmt(analysis.warehouseSavings)} on ${analysis.warehouseItemCount} item${analysis.warehouseItemCount !== 1 ? 's' : ''}.
+          If the warehouse is nearby, it's worth it — otherwise, consider combining with a larger haul.
         </div>
       </div>
-      <div class="rec-item-right">
-        ${badge}
-        ${savings}
-      </div>
-    </div>`;
-  }).join('');
+    `;
+  }
+
   el('rec-items').innerHTML = recHTML;
 
   // Insights
-  const insights = generateInsights(analysis, state.householdSize, state.locationInfo);
+  const insights = generateInsights(analysis, state.householdSize, state.locationInfo, state.hasMembership);
   el('insights-grid').innerHTML = insights.map(ins => `
     <div class="insight-card">
       <div class="insight-header">
@@ -692,9 +844,9 @@ function renderResults(analysis) {
       <div class="membership-roi-text">
         <div class="membership-roi-title">A warehouse membership could pay for itself in ~${payoff} month${payoff !== 1 ? 's' : ''}</div>
         <div class="membership-roi-body">
-          Based on your shopping patterns, you'd save ~${fmt(analysis.warehouseSavings)} per trip.
-          A Costco membership runs ~$65/year ($5.42/mo); Sam's Club ~$50/year ($4.17/mo).
-          If you shop this way weekly, that's ~${fmt(analysis.warehouseSavings * 52)} in annual savings — well above the membership cost.
+          Based on your list, you'd save ~${fmt(analysis.warehouseSavings)} per trip.
+          A Costco membership is ~$65/year ($5.42/mo); Sam's Club ~$50/year ($4.17/mo).
+          Shopping this way weekly = ~${fmt(analysis.annualSavingsEstimate)}/year in savings — well above the membership fee.
         </div>
       </div>
     `;
@@ -703,84 +855,119 @@ function renderResults(analysis) {
   }
 }
 
-function generateInsights(analysis, householdSize, locationInfo) {
+function generateInsights(analysis, householdSize, locationInfo, hasMembership) {
   const insights = [];
 
-  // Perishables insight
-  const perishableItems = analysis.items.filter(r =>
-    r.catMeta.bulkWasteRisk && r.rec === 'local'
-  );
+  // Perishables insight — only show if there are perishables going local
+  const perishableItems = analysis.localItems.filter(r => r.catMeta.bulkWasteRisk);
   if (perishableItems.length > 0) {
+    const names = perishableItems.slice(0, 2).map(i => `<strong>${i.catalogName}</strong>`).join(' and ');
     insights.push({
       icon: '🌿',
       bg: '#D1FAE5', color: '#065F46',
-      title: 'Fresh Items: Go Local',
-      body: `Items like <strong>${perishableItems.slice(0,2).map(i=>i.catalogName).join(', ')}</strong> are perishable. Buying only what you'll use in 5–7 days reduces food waste and often means better quality.`,
+      title: 'Buy Fresh Locally',
+      body: `${names} ${perishableItems.length > 1 ? 'are' : 'is'} perishable. Buying only what you'll use in a week means better quality and less food waste — the local grocery wins here.`,
     });
   }
 
-  // Bulk wins insight
-  const bulkWins = analysis.items.filter(r => r.rec === 'warehouse' && r.actualSavings > 1);
+  // Biggest bulk savings item
+  const bulkWins = analysis.warehouseItems.filter(r => r.actualSavings > 0.50);
   if (bulkWins.length > 0) {
-    const topSaver = bulkWins.sort((a, b) => b.actualSavings - a.actualSavings)[0];
+    const topSaver = [...bulkWins].sort((a, b) => b.actualSavings - a.actualSavings)[0];
+    const pct = Math.round(topSaver.perUnitPct * 100);
     insights.push({
       icon: '📦',
       bg: '#DBEAFE', color: '#1E40AF',
-      title: 'Biggest Bulk Win',
-      body: `<strong>${topSaver.catalogName}</strong> saves you ${fmt(topSaver.actualSavings)} (${Math.round(topSaver.perUnitPct * 100)}% per unit) when bought in bulk. Non-perishables like this are the sweet spot for warehouse shopping.`,
+      title: `Biggest Bulk Win: ${topSaver.catalogName}`,
+      body: `<strong>${topSaver.catalogName}</strong> saves you ${fmt(topSaver.actualSavings)} on this trip — that's <strong>${pct}% cheaper per ${topSaver.unit}</strong> at the warehouse. This category (${topSaver.catMeta.name}) is a warehouse sweet spot.`,
     });
   }
 
   // Household-size specific advice
   if (householdSize <= 2) {
-    insights.push({
-      icon: '👤',
-      bg: '#F3E8FF', color: '#6B21A8',
-      title: 'Small Household Tip',
-      body: `With ${householdSize} person${householdSize > 1 ? 's' : ''}, focus warehouse trips on shelf-stable items: paper goods, cleaning supplies, pantry staples, and frozen foods. Share a membership with another household to maximize value.`,
-    });
+    const warehousePerishables = analysis.warehouseItems.filter(r => r.catMeta.bulkWasteRisk);
+    const nonPerishableRec = ['cleaning', 'pantry', 'personal', 'frozen', 'beverages'];
+    const strongBulkItems = analysis.warehouseItems.filter(r => nonPerishableRec.includes(r.category));
+    if (strongBulkItems.length > 0) {
+      insights.push({
+        icon: '👤',
+        bg: '#F3E8FF', color: '#6B21A8',
+        title: `Small Household Strategy`,
+        body: `For ${householdSize} ${householdSize === 1 ? 'person' : 'people'}, focus warehouse trips on shelf-stable wins: ${strongBulkItems.slice(0, 3).map(i => `<strong>${i.catalogName}</strong>`).join(', ')}. For perishables, buy small and buy local.${warehousePerishables.length > 0 ? ' Items like ' + warehousePerishables.map(i => i.catalogName).join(', ') + ' have been cleared as manageable even at smaller scale.' : ''}`,
+      });
+    } else {
+      insights.push({
+        icon: '👤',
+        bg: '#F3E8FF', color: '#6B21A8',
+        title: 'Small Household Tip',
+        body: `With ${householdSize} ${householdSize === 1 ? 'person' : 'people'}, prioritize warehouse for paper goods, cleaning supplies, pantry staples, and frozen foods. Consider sharing a membership with a neighbor or family member to maximize value.`,
+      });
+    }
   } else if (householdSize >= 4) {
+    const bulkReadyCategories = [...new Set(analysis.warehouseItems.map(r => r.catMeta.name))];
     insights.push({
       icon: '👨‍👩‍👧‍👦',
       bg: '#FEF3C7', color: '#92400E',
-      title: 'Large Household Advantage',
-      body: `With ${householdSize} people, you have a natural advantage at warehouse clubs. Perishables like dairy, eggs, and produce can all be bought in bulk — your household moves through them before spoilage.`,
+      title: `${householdSize}-Person Household Advantage`,
+      body: `With ${householdSize} people, you move through groceries fast enough to unlock bulk buying across more categories — ${bulkReadyCategories.slice(0, 3).join(', ')} included. This is where warehouse clubs are built for you.`,
     });
   }
 
-  // Location insight
+  // Location insight (only for higher-cost regions)
   if (locationInfo.tier.localMultiplier >= 1.15) {
+    const uplift = Math.round((locationInfo.tier.localMultiplier - 1) * 100);
+    const warehouseUplift = Math.round((locationInfo.tier.warehouseMultiplier - 1) * 100);
+    const gap = uplift - warehouseUplift;
     insights.push({
       icon: '📍',
       bg: '#FFF7ED', color: '#9A3412',
-      title: `${locationInfo.region}: Higher Local Prices`,
-      body: `Grocery prices in ${locationInfo.region} run about ${Math.round((locationInfo.tier.localMultiplier - 1) * 100)}% above the national average. This widens the savings gap for warehouse shopping — especially on produce, dairy, and protein.`,
+      title: `${locationInfo.region}: Wider Savings Gap`,
+      body: `Local grocery prices in ${locationInfo.region} run ~${uplift}% above the national average, while warehouse prices only rise ~${warehouseUplift}%. That ${gap}-point gap <strong>amplifies your bulk savings</strong> — especially on produce, dairy, and protein.`,
+    });
+  } else if (locationInfo.tier === LOCATION_TIERS.rural || locationInfo.tier.localMultiplier < 0.95) {
+    insights.push({
+      icon: '📍',
+      bg: '#FFF7ED', color: '#9A3412',
+      title: `${locationInfo.region}: Factor in the Trip`,
+      body: `Local grocery prices in your area are below average, which narrows the warehouse savings gap. If a warehouse club requires a dedicated trip, make sure your savings (${fmt(analysis.warehouseSavings)} this run) justify the gas and time. Consider a monthly consolidated haul.`,
     });
   }
 
-  // Freeze tip for meat
-  const meatItems = analysis.items.filter(r => r.category === 'meat' && r.rec === 'warehouse');
+  // Meat freezing tip
+  const meatItems = analysis.warehouseItems.filter(r => r.category === 'meat');
   if (meatItems.length > 0) {
     insights.push({
       icon: '🧊',
       bg: '#E0F2FE', color: '#0C4A6E',
       title: 'Freeze Meat in Portions',
-      body: `Warehouse meat comes in large packs — great savings, but portion it the day you buy it. Divide into meal-sized bags before freezing. ${meatItems.map(i => i.catalogName).join(', ')} ${meatItems.length > 1 ? 'all freeze' : 'freezes'} well for up to 4–6 months.`,
+      body: `Warehouse packs of ${meatItems.map(i => i.catalogName).join(', ')} are great value — but portion them before freezing. Divide into meal-sized bags the same day you buy. Properly wrapped, these proteins freeze well for 4–6 months.`,
     });
   }
 
-  // Always show a category guide
-  insights.push({
-    icon: '🗺️',
-    bg: '#F0FDF4', color: '#14532D',
-    title: 'Quick Category Guide',
-    body: `<ul>
-      <li><strong>Always warehouse:</strong> paper goods, cleaning, nuts, coffee, oil</li>
-      <li><strong>Usually warehouse:</strong> meat, frozen, canned goods, dairy (large hh)</li>
-      <li><strong>Usually local:</strong> fresh produce, bread, specialty items</li>
-      <li><strong>It depends:</strong> snacks (check dates), yogurt, eggs (household size)</li>
-    </ul>`,
-  });
+  // Annual savings projection (if meaningful)
+  if (analysis.annualSavingsEstimate >= 100 && analysis.warehouseItems.length > 0) {
+    insights.push({
+      icon: '📈',
+      bg: '#F0FDF4', color: '#14532D',
+      title: 'Annual Savings Projection',
+      body: `If you shop this way every week, your warehouse savings add up to ~<strong>${fmt(analysis.annualSavingsEstimate)}/year</strong>. Even shopping this way twice a month puts you at ~${fmt(analysis.annualSavingsEstimate / 2.5)}/year — well above the membership cost${hasMembership ? '' : ' (if you join)'}.`,
+    });
+  }
+
+  // Category guide — always include as last resort if we don't have 4 insights
+  if (insights.length < 3) {
+    insights.push({
+      icon: '🗺️',
+      bg: '#F0FDF4', color: '#14532D',
+      title: 'Quick Category Guide',
+      body: `<ul>
+        <li><strong>Always warehouse:</strong> paper goods, cleaning, nuts, coffee, olive oil</li>
+        <li><strong>Usually warehouse:</strong> meat (freeze it), frozen foods, canned goods, dairy (larger households)</li>
+        <li><strong>Usually local:</strong> fresh produce, bread, specialty items</li>
+        <li><strong>It depends:</strong> snacks (check dates), yogurt, eggs (household size matters)</li>
+      </ul>`,
+    });
+  }
 
   return insights.slice(0, 4);
 }
@@ -792,12 +979,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Household size
   const sizePicker = el('size-picker');
   const hintMessages = {
-    1: 'Solo shopper — prioritize fresh local items; only bulk non-perishables.',
-    2: 'Small household — fresh items local; bulk cleaning, pantry, and proteins.',
-    3: 'Medium household — good mix. Dairy in bulk works; produce still local.',
-    4: 'Great size for warehouse clubs — most categories make sense in bulk.',
-    5: 'Large household — warehouse clubs are almost always the right call.',
-    6: 'Big family — warehouse clubs are built for you. Maximize bulk purchases.',
+    1: 'Solo shopper — bulk non-perishables only. Fresh produce and dairy are almost always better locally.',
+    2: 'Small household — strong for pantry, cleaning, and proteins. Perishables should be bought fresh.',
+    3: 'Medium household — good mix. Dairy in bulk works well; most produce still better local.',
+    4: 'Great size for warehouse clubs — most categories make financial sense in bulk.',
+    5: 'Large household — warehouse clubs are almost always the right call across the board.',
+    6: 'Big family — warehouse clubs are built for you. Buy everything bulk except specialty items.',
   };
   sizePicker.querySelectorAll('.size-btn').forEach(btn => {
     btn.addEventListener('click', () => {
@@ -913,7 +1100,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Quick pills
   document.querySelectorAll('.quick-pill').forEach(pill => {
     pill.addEventListener('click', () => {
-      const item = CATALOG.find(i => i.name === pill.dataset.item);
       addItem(pill.dataset.item, 1);
       pill.classList.add('active');
       setTimeout(() => pill.classList.remove('active'), 300);
