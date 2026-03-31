@@ -1186,6 +1186,13 @@ const GOAL_PROFILES = {
     ],
     headline: 'Weight Loss Plan', badge: '🥗',
     tip: 'Focus on lean protein and fiber-rich vegetables to stay full while maintaining a calorie deficit.',
+    suggestions: [
+      { name: 'Bell Peppers', qty: 2, reason: 'Low-calorie and high in vitamin C — great for stir-fries or raw snacking' },
+      { name: 'Cottage Cheese', qty: 2, reason: 'High-protein, low-fat snack that keeps hunger at bay for hours' },
+      { name: 'Canned Tuna', qty: 4, reason: 'Quick, cheap lean protein — perfect for no-cook lunches' },
+      { name: 'Zucchini', qty: 2, reason: 'Very low calorie — spiralize it or bulk up any meal without extra calories' },
+      { name: 'Celery', qty: 1, reason: 'Almost zero calories — pairs perfectly with almond butter as a filling snack' },
+    ],
   },
   muscleGain: {
     keywords: ['build muscle', 'gain muscle', 'bulk', 'bulking', 'muscle mass', 'high protein', 'muscle building', 'bodybuilding', 'strength', 'protein intake', 'gain weight'],
@@ -1210,6 +1217,13 @@ const GOAL_PROFILES = {
     ],
     headline: 'Muscle Building Plan', badge: '💪',
     tip: 'Prioritize protein at every meal (aim for 0.7–1g per lb of bodyweight). Rice and oats provide the sustained energy your training demands.',
+    suggestions: [
+      { name: 'Cottage Cheese', qty: 2, reason: 'Slow-digesting casein protein — ideal before bed for overnight muscle recovery' },
+      { name: 'Sweet Potatoes', qty: 3, reason: 'Complex carbs that fuel long training sessions and replenish glycogen' },
+      { name: 'Milk', qty: 2, reason: 'Classic post-workout protein + carbs in one glass' },
+      { name: 'Peanut Butter', qty: 1, reason: 'Calorie-dense and protein-rich — easy way to hit your calorie surplus' },
+      { name: 'Frozen Vegetables', qty: 2, reason: 'Quick nutrition without any prep — toss into any protein bowl' },
+    ],
   },
   cutting: {
     keywords: ['cutting', 'lean out', 'get lean', 'shred', 'shredded', 'cut phase', 'reduce body fat', 'low calorie high protein', 'competition prep'],
@@ -1234,6 +1248,13 @@ const GOAL_PROFILES = {
     ],
     headline: 'Cutting / Fat Loss Plan', badge: '🔥',
     tip: 'Keep carbs low, protein high, and lean on fibrous vegetables to fill your plate without exceeding your calorie target.',
+    suggestions: [
+      { name: 'Cottage Cheese', qty: 2, reason: 'High protein, very low fat — one of the best cutting-phase foods' },
+      { name: 'Zucchini', qty: 2, reason: 'Extremely low calorie — use as noodles or bulk up any meal for free' },
+      { name: 'Mushrooms', qty: 2, reason: 'Low calorie with satisfying texture — great for making meals more filling' },
+      { name: 'Frozen Vegetables', qty: 2, reason: 'Quick volume eating — fill your plate without blowing your calorie budget' },
+      { name: 'Apples', qty: 1, reason: 'High-fiber fruit that curbs sweet cravings at very low calorie cost' },
+    ],
   },
   mealPrep: {
     keywords: ['meal prep', 'batch cook', 'prep meals', 'food prep', 'prep for the week', 'weekly prep', 'cook ahead', 'prep sunday'],
@@ -1258,6 +1279,13 @@ const GOAL_PROFILES = {
     ],
     headline: 'Weekly Meal Prep Plan', badge: '📦',
     tip: 'Block 2–3 hours on Sunday. Cook grains and proteins in bulk; store in portioned containers for easy grab-and-go meals all week.',
+    suggestions: [
+      { name: 'Sweet Potatoes', qty: 3, reason: 'Batch-roast on Sunday — they keep well all week as a nutritious side' },
+      { name: 'Bell Peppers', qty: 3, reason: 'Prep raw for snacking or roast with olive oil — adds color and crunch to any bowl' },
+      { name: 'Peanut Butter', qty: 1, reason: 'Quick protein addition to oatmeal, smoothies, or snack bags' },
+      { name: 'Cottage Cheese', qty: 2, reason: 'High-protein, no-prep snack — just grab from the fridge' },
+      { name: 'Apples', qty: 2, reason: 'Perfect grab-and-go snack to round out any meal prep container' },
+    ],
   },
   keto: {
     keywords: ['keto', 'ketogenic', 'low carb', 'no carb', 'carnivore', 'ketosis', 'keto diet', 'high fat low carb'],
@@ -1282,6 +1310,13 @@ const GOAL_PROFILES = {
     ],
     headline: 'Keto / Low-Carb Plan', badge: '🥑',
     tip: "Aim for under 20g net carbs per day. Fat is your fuel — don't fear butter, cheese, and fatty cuts of meat.",
+    suggestions: [
+      { name: 'Cauliflower', qty: 2, reason: 'The ultimate keto staple — rice it, mash it, or roast it instead of grains' },
+      { name: 'Pork Rinds', qty: 1, reason: 'Zero carbs, satisfying crunch — a perfect keto snack alternative to chips' },
+      { name: 'Walnuts', qty: 1, reason: 'High in healthy fats and omega-3s — an easy keto-friendly snack' },
+      { name: 'Zucchini', qty: 2, reason: 'Great noodle substitute — pairs well with ground beef for a low-carb pasta dish' },
+      { name: 'Salmon', qty: 2, reason: 'Rich in fat and protein — one of the best whole foods for a ketogenic diet' },
+    ],
   },
   healthyEating: {
     keywords: ['healthy', 'balanced', 'nutritious', 'whole foods', 'clean eating', 'wellness', 'better eating', 'eat better', 'wholesome', 'well rounded'],
@@ -1306,8 +1341,202 @@ const GOAL_PROFILES = {
     ],
     headline: 'Balanced Healthy Eating Plan', badge: '🌿',
     tip: 'Fill half your plate with vegetables, a quarter with lean protein, and a quarter with whole grains for a simple, balanced approach.',
+    suggestions: [
+      { name: 'Sweet Potatoes', qty: 2, reason: 'Nutrient-dense complex carb — one of the most nutritious vegetables you can eat' },
+      { name: 'Avocados', qty: 3, reason: 'Healthy fats and fiber — great on toast, in salads, or as a snack' },
+      { name: 'Walnuts', qty: 1, reason: 'Rich in omega-3s and antioxidants — a simple nutritional upgrade' },
+      { name: 'Bell Peppers', qty: 2, reason: 'High in vitamin C and fiber — easy to add color and nutrition to any meal' },
+      { name: 'Salmon', qty: 2, reason: 'Heart-healthy omega-3 protein — a great alternative to chicken twice a week' },
+    ],
   },
 };
+
+// ─── GOAL REFINEMENTS ─────────────────────────────────────────────────────────
+
+const REFINEMENT_DEFS = {
+  'budget-friendly': {
+    label: 'Budget-friendly', icon: '💰',
+    swaps: {
+      'Steak':        { name: 'Ground Turkey',    qty: 2 },
+      'Ground Beef':  { name: 'Canned Beans',     qty: 3 },
+      'Heavy Cream':  { name: 'Milk',             qty: 1 },
+      'Avocados':     { name: 'Frozen Vegetables',qty: 2 },
+    },
+    addItems: [],
+    extraMealPrep: [
+      'Canned tuna lettuce wraps — no cooking required',
+      'Egg fried rice with leftover rice — fast, cheap, filling',
+    ],
+    extraSnacks: [
+      'Banana with peanut butter',
+      'Bulk peanuts or sunflower seeds',
+    ],
+    tipAppend: ' Look for store-brand items and buy proteins in larger packs to lower your per-unit cost.',
+  },
+  'higher-protein': {
+    label: 'Higher protein', icon: '🥩',
+    boostQty: ['Chicken Breast', 'Ground Turkey', 'Ground Beef', 'Eggs', 'Canned Tuna'],
+    addItems: [
+      { name: 'Cottage Cheese', qty: 2 },
+      { name: 'Canned Tuna',    qty: 4 },
+    ],
+    extraMealPrep: [
+      'Egg muffins — bake a dozen, freeze, and reheat all week',
+      'Cottage cheese bowl with berries — high protein, zero cooking',
+    ],
+    extraSnacks: [
+      'Cottage cheese with a drizzle of honey',
+      'Hard-boiled eggs (3)',
+      'Tuna on celery sticks',
+    ],
+    tipAppend: ' Aim for 30–40g protein per meal. Cottage cheese and canned tuna are fast, affordable protein boosts.',
+  },
+  'easier-meal-prep': {
+    label: 'Easier meal prep', icon: '⏱️',
+    addItems: [
+      { name: 'Frozen Vegetables', qty: 3 },
+      { name: 'Canned Beans',      qty: 3 },
+    ],
+    mealPrepReplace: [
+      'Sheet-pan chicken + frozen veggies — toss in oil, 25 min at 400°F, done',
+      'Rice cooker rice with canned beans — set it and walk away',
+      'Scrambled eggs with frozen spinach — under 10 minutes start to finish',
+      '5-ingredient overnight oats — mix before bed, ready by morning',
+    ],
+    extraSnacks: [
+      'String cheese — no prep, just grab and go',
+      'Individual yogurt cups — ready in the fridge all week',
+    ],
+    tipAppend: ' Sheet-pan dinners and a rice cooker cut active prep time dramatically. Frozen veg are just as nutritious as fresh.',
+  },
+  'more-snacks': {
+    label: 'More snacks', icon: '🍎',
+    addItems: [
+      { name: 'Apples',      qty: 2 },
+      { name: 'Almonds',     qty: 1 },
+      { name: 'Greek Yogurt',qty: 2 },
+    ],
+    snacksReplace: [
+      'Apple slices with almond butter',
+      'String cheese + rice cakes',
+      'Greek yogurt with a drizzle of honey',
+      'A handful of almonds or mixed nuts',
+      'Hard-boiled eggs — prep a batch of 6 for the week',
+      'Cucumber slices with hummus',
+      'Banana with peanut butter',
+    ],
+    tipAppend: ' Pre-portion snacks into bags or containers on Sunday so they\'re ready to grab throughout the week.',
+  },
+  'lower-carb': {
+    label: 'Lower carb', icon: '🥦',
+    swaps: {
+      'Rice':    { name: 'Cauliflower', qty: 2 },
+      'Oatmeal': { name: 'Eggs',        qty: 1 },
+    },
+    removeItems: ['Rice', 'Oatmeal'],
+    addItems: [
+      { name: 'Cauliflower', qty: 2 },
+      { name: 'Zucchini',    qty: 2 },
+    ],
+    extraMealPrep: [
+      'Cauliflower rice stir-fry with chicken and veggies — easy low-carb swap',
+      'Egg scramble with zucchini, spinach, and cheese — under 15 minutes',
+    ],
+    extraSnacks: [
+      'Celery with almond butter',
+      'Cheese slices with deli turkey',
+      'Cucumber rounds with cream cheese',
+    ],
+    tipAppend: ' Swap rice for cauliflower rice and oats for eggs to significantly cut carbohydrate intake.',
+  },
+};
+
+let currentGoalState = { baseProfile: null, activeRefinements: new Set(), goalText: '', manualAdditions: [] };
+
+function applyRefinements(baseProfile, activeRefinements) {
+  const profile = {
+    ...baseProfile,
+    items:    baseProfile.items.map(i => ({ ...i })),
+    mealPrep: [...baseProfile.mealPrep],
+    snacks:   [...baseProfile.snacks],
+    tip:      baseProfile.tip,
+  };
+
+  for (const refKey of activeRefinements) {
+    const def = REFINEMENT_DEFS[refKey];
+    if (!def) continue;
+
+    // Swap items
+    if (def.swaps) {
+      for (const [fromName, toItem] of Object.entries(def.swaps)) {
+        const fromIdx = profile.items.findIndex(i => i.name.toLowerCase() === fromName.toLowerCase());
+        if (fromIdx >= 0) {
+          const toIdx = profile.items.findIndex(i => i.name.toLowerCase() === toItem.name.toLowerCase());
+          if (toIdx >= 0) {
+            profile.items.splice(fromIdx, 1); // target already present, just remove source
+          } else {
+            profile.items[fromIdx] = { name: toItem.name, qty: toItem.qty };
+          }
+        }
+      }
+    }
+
+    // Remove items (without a swap target)
+    if (def.removeItems) {
+      const removeLower = def.removeItems.map(n => n.toLowerCase());
+      profile.items = profile.items.filter(i => !removeLower.includes(i.name.toLowerCase()));
+    }
+
+    // Boost quantity on named items
+    if (def.boostQty) {
+      const boostLower = def.boostQty.map(n => n.toLowerCase());
+      profile.items = profile.items.map(i =>
+        boostLower.includes(i.name.toLowerCase()) ? { ...i, qty: i.qty + 1 } : i
+      );
+    }
+
+    // Add items not already present
+    if (def.addItems) {
+      for (const item of def.addItems) {
+        if (!profile.items.some(i => i.name.toLowerCase() === item.name.toLowerCase())) {
+          profile.items.push({ ...item });
+        }
+      }
+    }
+
+    // Replace all meal prep ideas
+    if (def.mealPrepReplace) {
+      profile.mealPrep = [...def.mealPrepReplace];
+    }
+    // Append additional meal prep ideas
+    if (def.extraMealPrep) {
+      const existingLower = new Set(profile.mealPrep.map(s => s.toLowerCase()));
+      for (const idea of def.extraMealPrep) {
+        if (!existingLower.has(idea.toLowerCase())) profile.mealPrep.push(idea);
+      }
+      profile.mealPrep = profile.mealPrep.slice(0, 6);
+    }
+
+    // Replace all snack ideas
+    if (def.snacksReplace) {
+      profile.snacks = [...def.snacksReplace];
+    }
+    // Append additional snack ideas
+    if (def.extraSnacks) {
+      const existingLower = new Set(profile.snacks.map(s => s.toLowerCase()));
+      for (const snack of def.extraSnacks) {
+        if (!existingLower.has(snack.toLowerCase())) profile.snacks.push(snack);
+      }
+    }
+
+    // Append to tip
+    if (def.tipAppend) {
+      profile.tip = profile.tip + def.tipAppend;
+    }
+  }
+
+  return profile;
+}
 
 function parseGoal(text) {
   const lower = text.toLowerCase();
@@ -1323,11 +1552,19 @@ function parseGoal(text) {
   return best || { key: 'healthyEating', ...GOAL_PROFILES.healthyEating };
 }
 
-function renderGoalSuggestions(goal, goalText) {
+function renderGoalSuggestions(baseProfile, goalText) {
+  currentGoalState = { baseProfile, activeRefinements: new Set(), goalText, manualAdditions: [] };
+  _renderGoalResults(true);
+}
+
+function _renderGoalResults(initial = false) {
+  const { baseProfile, activeRefinements, goalText, manualAdditions } = currentGoalState;
+  const goal = applyRefinements(baseProfile, activeRefinements);
   const results = document.getElementById('goal-results');
-  const banner = document.getElementById('goal-banner');
   const truncated = goalText.length > 90 ? goalText.slice(0, 90) + '…' : goalText;
-  banner.innerHTML = `
+
+  // Banner
+  document.getElementById('goal-banner').innerHTML = `
     <div class="goal-banner-inner">
       <div class="goal-banner-badge">${goal.badge}</div>
       <div class="goal-banner-content">
@@ -1337,23 +1574,65 @@ function renderGoalSuggestions(goal, goalText) {
     </div>
     <div class="goal-tip">${escHtml(goal.tip)}</div>`;
 
-  document.getElementById('goal-items-list').innerHTML = `
-    <div class="goal-items-list">
-      ${goal.items.map(item => `
-        <label class="goal-item-check">
-          <input type="checkbox" class="goal-item-checkbox" data-name="${escHtml(item.name)}" data-qty="${item.qty}" checked>
-          <span class="goal-item-name">${escHtml(item.name)}</span>
-          <span class="goal-item-qty">×${item.qty}</span>
-        </label>`).join('')}
+  // Refinement chips
+  document.getElementById('goal-refinements').innerHTML = `
+    <div class="refinements-row">
+      <span class="refinements-label">Refine:</span>
+      <div class="refinements-chips">
+        ${Object.entries(REFINEMENT_DEFS).map(([key, def]) => `
+          <button class="refinement-chip${activeRefinements.has(key) ? ' active' : ''}" data-refinement="${key}">
+            <span aria-hidden="true">${def.icon}</span>${escHtml(def.label)}
+          </button>`).join('')}
+      </div>
     </div>`;
 
+  // Items list: base (possibly refined) + manually added suggestions
+  const baseItemNames = new Set(goal.items.map(i => i.name.toLowerCase()));
+  const extraItems = manualAdditions.filter(i => !baseItemNames.has(i.name.toLowerCase()));
+  const allItems = [...goal.items, ...extraItems];
+
+  document.getElementById('goal-items-list').innerHTML = allItems.map(item => `
+    <label class="goal-item-check">
+      <input type="checkbox" class="goal-item-checkbox" data-name="${escHtml(item.name)}" data-qty="${item.qty}" checked>
+      <span class="goal-item-name">${escHtml(item.name)}</span>
+      <span class="goal-item-qty">×${item.qty}</span>
+    </label>`).join('');
+
+  // Suggestions: items from baseProfile.suggestions not already in allItems
+  const allItemNames = new Set(allItems.map(i => i.name.toLowerCase()));
+  const suggestions = (baseProfile.suggestions || []).filter(s => !allItemNames.has(s.name.toLowerCase()));
+  const suggestEl = document.getElementById('goal-suggestions');
+  if (suggestions.length > 0) {
+    suggestEl.style.display = '';
+    suggestEl.innerHTML = `
+      <div class="card goal-suggestions-card">
+        <div class="goal-suggestions-header">
+          <div class="card-title">You might also want to add</div>
+          <div class="card-sub">Foods that work well with your ${escHtml(goal.headline.toLowerCase())}</div>
+        </div>
+        <div class="goal-suggest-list">
+          ${suggestions.slice(0, 5).map(s => `
+            <div class="goal-suggest-item">
+              <div class="goal-suggest-info">
+                <span class="goal-suggest-name">${escHtml(s.name)}</span>
+                <span class="goal-suggest-reason">${escHtml(s.reason)}</span>
+              </div>
+              <button class="btn-suggest-add" data-name="${escHtml(s.name)}" data-qty="${s.qty}">+ Add</button>
+            </div>`).join('')}
+        </div>
+      </div>`;
+  } else {
+    suggestEl.style.display = 'none';
+  }
+
+  // Meal prep + snacks
   document.getElementById('meal-prep-ideas').innerHTML = goal.mealPrep.map(idea =>
     `<div class="idea-item"><span class="idea-dot"></span><span>${escHtml(idea)}</span></div>`).join('');
   document.getElementById('snack-ideas').innerHTML = goal.snacks.map(snack =>
     `<div class="idea-item"><span class="idea-dot"></span><span>${escHtml(snack)}</span></div>`).join('');
 
   results.style.display = '';
-  setTimeout(() => results.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+  if (initial) setTimeout(() => results.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -1657,6 +1936,31 @@ document.addEventListener('DOMContentLoaded', () => {
     switchTab('optimizer');
     setTimeout(() => { const s = document.getElementById('section-list'); if (s) s.scrollIntoView({ behavior: 'smooth' }); }, 320);
     if (added > 0) showToast(`${added} item${added !== 1 ? 's' : ''} added to your list`);
+  });
+
+  // ── Fitness goals — refinement chips (event delegation)
+  document.getElementById('goal-refinements')?.addEventListener('click', e => {
+    const chip = e.target.closest('.refinement-chip');
+    if (!chip || !currentGoalState.baseProfile) return;
+    const key = chip.dataset.refinement;
+    if (currentGoalState.activeRefinements.has(key)) {
+      currentGoalState.activeRefinements.delete(key);
+    } else {
+      currentGoalState.activeRefinements.add(key);
+    }
+    _renderGoalResults();
+  });
+
+  // ── Fitness goals — add suggested item to the checked list
+  document.getElementById('goal-suggestions')?.addEventListener('click', e => {
+    const btn = e.target.closest('.btn-suggest-add');
+    if (!btn || !currentGoalState.baseProfile) return;
+    const name = btn.dataset.name;
+    const qty = parseInt(btn.dataset.qty, 10) || 1;
+    if (!currentGoalState.manualAdditions.some(i => i.name.toLowerCase() === name.toLowerCase())) {
+      currentGoalState.manualAdditions.push({ name, qty });
+    }
+    _renderGoalResults();
   });
 
   // ── Init

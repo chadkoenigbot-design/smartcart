@@ -1921,6 +1921,126 @@ body {
   margin-top: 6px;
 }
 
+/* ────────────────────────────────────────────────────────
+   GOAL REFINEMENT CHIPS
+──────────────────────────────────────────────────────── */
+
+.goal-refinements-wrap {
+  margin-bottom: 20px;
+  min-height: 0;
+}
+.goal-refinements-wrap:empty { display: none; }
+
+.refinements-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+.refinements-label {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  flex-shrink: 0;
+}
+.refinements-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+.refinement-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 13px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  background: var(--bg);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: border-color 0.15s, background 0.15s, color 0.15s, box-shadow 0.15s;
+  line-height: 1;
+}
+.refinement-chip:hover {
+  border-color: var(--primary-border);
+  background: var(--primary-pale);
+  color: var(--primary);
+}
+.refinement-chip.active {
+  border-color: var(--primary);
+  background: var(--primary-pale);
+  color: var(--primary);
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--primary);
+}
+
+/* ────────────────────────────────────────────────────────
+   GOAL FOOD SUGGESTIONS
+──────────────────────────────────────────────────────── */
+
+.goal-suggestions-card {
+  margin-bottom: 20px;
+}
+.goal-suggestions-header {
+  margin-bottom: 14px;
+}
+.goal-suggest-list {
+  display: flex;
+  flex-direction: column;
+}
+.goal-suggest-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid var(--border-light);
+}
+.goal-suggest-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.goal-suggest-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.goal-suggest-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+}
+.goal-suggest-reason {
+  font-size: 12.5px;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+.btn-suggest-add {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: var(--primary);
+  background: var(--primary-pale);
+  border: 1.5px solid var(--primary-border);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  font-family: var(--font);
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  white-space: nowrap;
+}
+.btn-suggest-add:hover {
+  background: var(--primary-border);
+  border-color: var(--primary-light);
+  color: var(--primary-dark, var(--primary));
+}
+
 /* ════════════════════════════════════════════════════════
    SAVED LISTS TAB
 ════════════════════════════════════════════════════════ */
@@ -2369,6 +2489,8 @@ body {
   .goal-ideas-grid { grid-template-columns: 1fr; }
   .goal-items-header { flex-direction: column; align-items: flex-start; }
   .btn-add-to-optimizer { width: 100%; justify-content: center; }
+  .goal-suggest-item { flex-wrap: wrap; }
+  .btn-suggest-add { margin-top: 4px; }
 
   .saved-list-card { flex-direction: column; align-items: flex-start; gap: 12px; }
   .saved-list-actions { width: 100%; }
