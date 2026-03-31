@@ -493,6 +493,9 @@ let state = {
   locationInfo: { tier: LOCATION_TIERS.suburban, region: 'Suburban Area' },
 };
 
+// In-session planning conversation thread
+let plannerThread = [];
+
 // ─── DOM HELPERS ─────────────────────────────────────────────────────────
 
 function fmt(n) { return '$' + Math.abs(n).toFixed(2); }
@@ -1642,6 +1645,93 @@ function applyRefinements(baseProfile, activeRefinements) {
   return profile;
 }
 
+function renderPlannerThread() {
+  const threadEl = el('planner-thread');
+  if (!threadEl) return;
+  if (plannerThread.length === 0) {
+    threadEl.style.display = 'none';
+    return;
+  }
+  threadEl.style.display = '';
+  threadEl.innerHTML = plannerThread.map((turn, i) => {
+    const previewItems = turn.items.slice(0, 4).map(item => item.name).join(', ');
+    const extra = turn.items.length > 4 ? ` +${turn.items.length - 4} more` : '';
+    const actionLine = i === 0
+      ? `Generated ${turn.items.length} items &mdash; <em>${escHtml(turn.label)}</em>`
+      : (turn.items.length > 0
+          ? `Added ${turn.items.length} item${turn.items.length !== 1 ? 's' : ''}`
+          : 'Your list already covers that — check the suggested items below');
+    return `
+      <div class="thread-turn${i === 0 ? ' thread-turn-first' : ''}">
+        <div class="thread-user-bubble">
+          <span class="thread-you-label">You</span>
+          <span class="thread-user-msg">${escHtml(turn.userMsg)}</span>
+        </div>
+        <div class="thread-response-bubble">
+          <span class="thread-bot-label">SmartCart</span>
+          <div class="thread-response-body">
+            <div class="thread-action-line">${actionLine}</div>
+            ${turn.items.length > 0 ? `<div class="thread-items-preview">${escHtml(previewItems)}${escHtml(extra)}</div>` : ''}
+          </div>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function handleUpdateWish() {
+  const input = el('update-wish-input');
+  const text = (input ? input.value : '').trim();
+  if (!text) { if (input) input.focus(); return; }
+  if (!currentGoalState.baseProfile) return;
+
+  const updateGoal = parseGoal(text);
+
+  // Build set of names already in the plan
+  const existingNames = new Set([
+    ...(currentGoalState.baseProfile.items || []).map(i => i.name.toLowerCase()),
+    ...currentGoalState.manualAdditions.map(i => i.name.toLowerCase()),
+  ]);
+
+  // Candidates: items from the matched update profile + its suggestions
+  const candidates = [
+    ...(updateGoal.items || []),
+    ...((updateGoal.suggestions || []).map(s => ({ name: s.name, qty: s.qty }))),
+  ];
+
+  const newItems = [];
+  const seen = new Set(existingNames);
+  for (const item of candidates) {
+    if (!seen.has(item.name.toLowerCase())) {
+      seen.add(item.name.toLowerCase());
+      newItems.push(item);
+      if (newItems.length >= 5) break;
+    }
+  }
+
+  // Fallback: try base profile suggestions if nothing new found
+  if (newItems.length === 0) {
+    for (const s of (currentGoalState.baseProfile.suggestions || [])) {
+      if (!existingNames.has(s.name.toLowerCase())) {
+        newItems.push({ name: s.name, qty: s.qty });
+        if (newItems.length >= 3) break;
+      }
+    }
+  }
+
+  currentGoalState.manualAdditions = [...currentGoalState.manualAdditions, ...newItems];
+
+  plannerThread.push({
+    userMsg: text,
+    action: 'update',
+    items: newItems,
+    label: updateGoal.headline,
+  });
+
+  renderPlannerThread();
+  _renderGoalResults(false);
+  if (input) input.value = '';
+}
+
 function parseGoal(text) {
   const lower = text.toLowerCase();
   let best = null;
@@ -2013,7 +2103,21 @@ document.addEventListener('DOMContentLoaded', () => {
     const text = (document.getElementById('goal-input')?.value || '').trim();
     if (!text) { document.getElementById('goal-input')?.focus(); return; }
     const goal = parseGoal(text);
+
+    // Reset thread on each new plan
+    plannerThread = [];
+    plannerThread.push({
+      userMsg: text,
+      action: 'generate',
+      items: goal.items || [],
+      label: goal.headline,
+    });
+
     renderGoalSuggestions(goal, text);
+    renderPlannerThread();
+
+    const updateWishEl = el('update-wish-section');
+    if (updateWishEl) updateWishEl.style.display = '';
   });
 
   // ── Fitness goals — example pills
@@ -2065,6 +2169,12 @@ document.addEventListener('DOMContentLoaded', () => {
       currentGoalState.manualAdditions.push({ name, qty });
     }
     _renderGoalResults();
+  });
+
+  // ── Update wish list
+  el('update-wish-btn')?.addEventListener('click', handleUpdateWish);
+  el('update-wish-input')?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') handleUpdateWish();
   });
 
   // ── Init

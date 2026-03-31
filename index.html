@@ -28,13 +28,13 @@
     <div class="header-nav">
       <div class="container">
         <nav class="nav-tabs" id="nav-tabs" role="tablist">
-          <button class="nav-tab active" data-tab="optimizer" role="tab" aria-selected="true">
+          <button class="nav-tab active" data-tab="goals" role="tab" aria-selected="true">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+            Planner
+          </button>
+          <button class="nav-tab" data-tab="optimizer" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Optimizer
-          </button>
-          <button class="nav-tab" data-tab="goals" role="tab" aria-selected="false">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-            Fitness Goals
           </button>
           <button class="nav-tab" data-tab="saved" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
@@ -52,15 +52,15 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: OPTIMIZER (default)                          -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-optimizer">
+  <div class="tab-panel" id="tab-optimizer" style="display:none">
 
     <!-- Hero -->
     <div class="hero">
       <div class="container">
         <div class="hero-inner">
-          <div class="hero-badge">Free shopping optimizer</div>
-          <h1 class="hero-title">Stop guessing. Start saving.</h1>
-          <p class="hero-desc">Enter your grocery list and we'll tell you exactly which items belong in your warehouse club cart — and which are better bought locally. Get a complete basket strategy in seconds.</p>
+          <div class="hero-badge">Price optimizer — step 2</div>
+          <h1 class="hero-title">Where should each item come from?</h1>
+          <p class="hero-desc">Send your planner-generated list here to see exactly which items belong in your warehouse club cart — and which are better bought locally. Get a complete basket strategy in seconds.</p>
           <div class="hero-stats">
             <div class="hero-stat"><strong>$600+</strong><span>avg. annual savings</span></div>
             <div class="hero-stat-divider"></div>
@@ -360,15 +360,15 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: FITNESS GOALS                                -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-goals" style="display:none">
+  <div class="tab-panel" id="tab-goals">
 
     <div class="goals-hero goals-hero-with-img" style="background-image:url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1400&q=80')">
       <div class="goals-hero-overlay"></div>
       <div class="container">
         <div class="goals-hero-inner">
-          <div class="goals-hero-badge">Powered by smart goal parsing</div>
-          <h1 class="goals-hero-title">Fitness Goals → Grocery List</h1>
-          <p class="goals-hero-desc">Describe your fitness goal in plain English and get a practical shopping list, meal prep ideas, and snack suggestions — ready to send straight to the optimizer.</p>
+          <div class="goals-hero-badge">Your personal grocery planner</div>
+          <h1 class="goals-hero-title">Plan your list, your way.</h1>
+          <p class="goals-hero-desc">Describe your goals, health needs, favorite cuisines, or cravings — and get a practical shopping list tailored to you. Refine it iteratively, then optimize for price.</p>
         </div>
       </div>
     </div>
@@ -380,10 +380,10 @@
           <!-- Goal Input Card -->
           <div class="card goal-input-card">
             <div class="goal-input-header">
-              <div class="card-title">Describe Your Fitness Goal</div>
-              <div class="card-sub">In plain English — be as specific or broad as you'd like</div>
+              <div class="card-title">What are you shopping for?</div>
+              <div class="card-sub">Goals, health concerns, cuisines, cravings — anything goes</div>
             </div>
-            <textarea id="goal-input" class="goal-textarea" placeholder="Examples: 'I want to lose 10 pounds', 'high protein meal prep for building muscle', 'healthy snacks for cutting', 'keto diet this month'..." rows="3"></textarea>
+            <textarea id="goal-input" class="goal-textarea" placeholder="Describe your goals, health needs, cravings, or cuisines — e.g. 'I want to lose weight, I love Mediterranean food and need high-protein breakfasts' or 'Meal prep for muscle gain, no dairy, craving something hearty'..." rows="3"></textarea>
             <div class="goal-examples-row">
               <span class="goal-examples-label">Try:</span>
               <div class="goal-example-pills">
@@ -396,9 +396,12 @@
             </div>
             <button class="btn-generate" id="generate-btn">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              Generate My Shopping Plan
+              Build My List
             </button>
           </div>
+
+          <!-- In-session planning thread -->
+          <div id="planner-thread" class="planner-thread" style="display:none"></div>
 
           <!-- Goal Results (hidden until generated) -->
           <div id="goal-results" style="display:none" class="goal-results-wrap">
@@ -418,7 +421,7 @@
                 </div>
                 <button class="btn-add-to-optimizer" id="add-to-optimizer-btn">
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
-                  Add to Optimizer
+                  Send to Optimizer
                 </button>
               </div>
               <div id="goal-items-list" class="goal-items-list"></div>
@@ -441,6 +444,18 @@
               </div>
             </div>
 
+          </div>
+
+          <!-- Update wish list (shown after first generate) -->
+          <div id="update-wish-section" class="update-wish-section" style="display:none">
+            <div class="update-wish-header">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+              Update your list
+            </div>
+            <div class="update-wish-row">
+              <input type="text" id="update-wish-input" class="text-input update-wish-input" placeholder="e.g. add some Mediterranean foods, also high-fiber breakfast options, remove the keto items...">
+              <button class="btn-update-wish" id="update-wish-btn">Update List</button>
+            </div>
           </div>
 
         </section>
@@ -525,7 +540,7 @@
           <div class="overview-badge">Free &nbsp;·&nbsp; No account needed &nbsp;·&nbsp; 100% local & private</div>
           <h1 class="overview-title">The Smart Way to Grocery Shop</h1>
           <p class="overview-desc">SmartCart is your personal grocery strategist — comparing warehouse club vs. local prices, factoring in household size, location, and perishability to tell you exactly where to buy every item on your list.</p>
-          <button class="btn-overview-cta" data-goto-tab="optimizer">Start Optimizing →</button>
+          <button class="btn-overview-cta" data-goto-tab="goals">Start Planning →</button>
         </div>
       </div>
     </div>
@@ -613,7 +628,7 @@
             <div class="lifestyle-banner-eyebrow">Built for real life</div>
             <h3 class="lifestyle-banner-title">Groceries that fit your goals, your budget, and your family.</h3>
             <p class="lifestyle-banner-desc">Whether you're meal prepping for the week, feeding a growing family, or staying on track with a fitness goal — SmartCart helps you buy the right things at the right places, every single time.</p>
-            <button class="btn-overview-cta" data-goto-tab="optimizer" style="margin-top:20px">Build Your List</button>
+            <button class="btn-overview-cta" data-goto-tab="goals" style="margin-top:20px">Build Your List</button>
           </div>
         </div>
 
@@ -642,7 +657,7 @@
 
         <!-- Bottom CTA -->
         <div class="overview-cta-row">
-          <button class="btn-overview-cta-large" data-goto-tab="optimizer">Start Optimizing My Grocery List</button>
+          <button class="btn-overview-cta-large" data-goto-tab="goals">Start Planning My Grocery List</button>
           <p class="overview-cta-note">Free to use. No signup. No tracking.</p>
         </div>
 

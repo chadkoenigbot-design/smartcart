@@ -2738,3 +2738,152 @@ body {
   transition: background 0.15s, border-color 0.15s;
 }
 .btn-edit-goal:hover { background: var(--primary-border); border-color: var(--primary-light); }
+
+/* === PLANNER THREAD === */
+
+.planner-thread {
+  margin-bottom: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+.thread-turn {
+  position: relative;
+  padding: 0 0 20px 0;
+}
+
+.thread-turn:not(:last-child)::after {
+  content: '';
+  position: absolute;
+  left: 14px;
+  top: 28px;
+  bottom: 0;
+  width: 2px;
+  background: var(--primary-border);
+}
+
+.thread-user-bubble {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.thread-you-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  background: var(--bg-dark);
+  border-radius: var(--radius-full);
+  padding: 2px 8px;
+}
+
+.thread-user-msg {
+  font-size: 0.9rem;
+  color: var(--text);
+  font-style: italic;
+  line-height: 1.5;
+}
+
+.thread-response-bubble {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  background: var(--primary-pale);
+  border: 1px solid var(--primary-border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  margin-left: 8px;
+}
+
+.thread-bot-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--primary-light);
+  flex-shrink: 0;
+  padding-top: 2px;
+}
+
+.thread-response-body {
+  flex: 1;
+}
+
+.thread-action-line {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 4px;
+}
+
+.thread-items-preview {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* === UPDATE WISH LIST === */
+
+.update-wish-section {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 20px;
+  margin-top: 24px;
+  box-shadow: var(--shadow-xs);
+}
+
+.update-wish-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+.update-wish-row {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.update-wish-input {
+  flex: 1;
+  min-width: 0;
+}
+
+.btn-update-wish {
+  flex-shrink: 0;
+  background: var(--primary);
+  color: #fff;
+  border: none;
+  border-radius: var(--radius);
+  padding: 10px 18px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.btn-update-wish:hover {
+  background: var(--primary-mid);
+}
+
+@media (max-width: 540px) {
+  .update-wish-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .btn-update-wish {
+    width: 100%;
+  }
+}
