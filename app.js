@@ -1286,6 +1286,503 @@ function resumeSession(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ─── BUDGET & RECEIPTS ───────────────────────────────────────────────────────
+
+const BUDGET_KEY   = 'smartcart_budget';
+const RECEIPTS_KEY = 'smartcart_receipts';
+
+function getBudget() {
+  try { return JSON.parse(localStorage.getItem(BUDGET_KEY) || 'null'); } catch (e) { return null; }
+}
+function saveBudget(data) { localStorage.setItem(BUDGET_KEY, JSON.stringify(data)); }
+
+function getReceipts() {
+  try { return JSON.parse(localStorage.getItem(RECEIPTS_KEY) || '[]'); } catch (e) { return []; }
+}
+function addReceipt(receipt) {
+  const all = getReceipts();
+  all.unshift(receipt);
+  localStorage.setItem(RECEIPTS_KEY, JSON.stringify(all.slice(0, 50)));
+}
+
+// ── Mock receipt templates (simulated scan results) ──────────────────────────
+const RECEIPT_TEMPLATES = [
+  {
+    store: 'Kroger',
+    items: [
+      { name: 'Chicken Breast',  category: 'meat',      qty: 2,   unitPrice: 4.99,  total: 9.98  },
+      { name: 'Eggs',            category: 'dairy',     qty: 1,   unitPrice: 5.49,  total: 5.49  },
+      { name: 'Spinach',         category: 'produce',   qty: 1,   unitPrice: 3.99,  total: 3.99  },
+      { name: 'Bananas',         category: 'produce',   qty: 2,   unitPrice: 0.29,  total: 0.58  },
+      { name: 'Greek Yogurt',    category: 'dairy',     qty: 4,   unitPrice: 1.79,  total: 7.16  },
+      { name: 'Pasta',           category: 'pantry',    qty: 2,   unitPrice: 1.99,  total: 3.98  },
+      { name: 'Broccoli',        category: 'produce',   qty: 2,   unitPrice: 1.99,  total: 3.98  },
+      { name: 'Coffee',          category: 'beverages', qty: 1,   unitPrice: 11.99, total: 11.99 },
+      { name: 'Canned Beans',    category: 'pantry',    qty: 3,   unitPrice: 1.29,  total: 3.87  },
+      { name: 'Olive Oil',       category: 'pantry',    qty: 1,   unitPrice: 9.99,  total: 9.99  },
+    ],
+  },
+  {
+    store: 'Whole Foods Market',
+    items: [
+      { name: 'Salmon',          category: 'meat',      qty: 1,   unitPrice: 13.99, total: 13.99 },
+      { name: 'Avocados',        category: 'produce',   qty: 4,   unitPrice: 1.49,  total: 5.96  },
+      { name: 'Blueberries',     category: 'produce',   qty: 2,   unitPrice: 4.49,  total: 8.98  },
+      { name: 'Strawberries',    category: 'produce',   qty: 1,   unitPrice: 3.99,  total: 3.99  },
+      { name: 'Milk',            category: 'dairy',     qty: 1,   unitPrice: 4.29,  total: 4.29  },
+      { name: 'Shredded Cheese', category: 'dairy',     qty: 1,   unitPrice: 5.49,  total: 5.49  },
+      { name: 'Oatmeal',         category: 'pantry',    qty: 1,   unitPrice: 4.49,  total: 4.49  },
+      { name: 'Honey',           category: 'pantry',    qty: 1,   unitPrice: 7.99,  total: 7.99  },
+      { name: 'Tea',             category: 'beverages', qty: 1,   unitPrice: 4.99,  total: 4.99  },
+    ],
+  },
+  {
+    store: 'Target',
+    items: [
+      { name: 'Ground Beef',     category: 'meat',      qty: 2,   unitPrice: 6.49,  total: 12.98 },
+      { name: 'Potatoes',        category: 'produce',   qty: 5,   unitPrice: 0.89,  total: 4.45  },
+      { name: 'Onions',          category: 'produce',   qty: 3,   unitPrice: 0.79,  total: 2.37  },
+      { name: 'Canned Tomatoes', category: 'pantry',    qty: 4,   unitPrice: 1.49,  total: 5.96  },
+      { name: 'Canned Tuna',     category: 'pantry',    qty: 6,   unitPrice: 1.49,  total: 8.94  },
+      { name: 'Rice',            category: 'pantry',    qty: 2,   unitPrice: 2.49,  total: 4.98  },
+      { name: 'Soda',            category: 'beverages', qty: 2,   unitPrice: 6.49,  total: 12.98 },
+      { name: 'Snacks',          category: 'snacks',    qty: 2,   unitPrice: 3.99,  total: 7.98  },
+      { name: 'Cereal',          category: 'pantry',    qty: 1,   unitPrice: 4.99,  total: 4.99  },
+    ],
+  },
+  {
+    store: "Trader Joe's",
+    items: [
+      { name: 'Ground Turkey',   category: 'meat',      qty: 2,   unitPrice: 5.99,  total: 11.98 },
+      { name: 'Bell Peppers',    category: 'produce',   qty: 4,   unitPrice: 1.29,  total: 5.16  },
+      { name: 'Tomatoes',        category: 'produce',   qty: 2,   unitPrice: 2.49,  total: 4.98  },
+      { name: 'Romaine Lettuce', category: 'produce',   qty: 2,   unitPrice: 2.99,  total: 5.98  },
+      { name: 'Eggs',            category: 'dairy',     qty: 2,   unitPrice: 5.49,  total: 10.98 },
+      { name: 'Butter',          category: 'dairy',     qty: 1,   unitPrice: 5.99,  total: 5.99  },
+      { name: 'Frozen Vegetables', category: 'frozen',  qty: 3,   unitPrice: 2.49,  total: 7.47  },
+      { name: 'Peanut Butter',   category: 'pantry',    qty: 1,   unitPrice: 4.99,  total: 4.99  },
+      { name: 'Orange Juice',    category: 'beverages', qty: 1,   unitPrice: 4.99,  total: 4.99  },
+    ],
+  },
+];
+
+// Pending parsed receipt (not yet confirmed)
+let pendingReceipt = null;
+
+// ── Period helpers ────────────────────────────────────────────────────────────
+
+function getPeriodDates(period) {
+  const now = new Date();
+  let start, end;
+  if (period === 'weekly') {
+    const day = now.getDay(); // 0=Sun
+    const diffToMon = day === 0 ? 6 : day - 1;
+    start = new Date(now); start.setDate(now.getDate() - diffToMon); start.setHours(0, 0, 0, 0);
+    end   = new Date(start); end.setDate(start.getDate() + 6); end.setHours(23, 59, 59, 999);
+  } else if (period === 'biweekly') {
+    start = new Date(now); start.setDate(now.getDate() - 13); start.setHours(0, 0, 0, 0);
+    end   = new Date(now); end.setHours(23, 59, 59, 999);
+  } else {
+    start = new Date(now.getFullYear(), now.getMonth(), 1);
+    end   = new Date(now.getFullYear(), now.getMonth() + 1, 0, 23, 59, 59, 999);
+  }
+  return { start, end };
+}
+
+function getReceiptsForPeriod(receipts, period) {
+  const { start, end } = getPeriodDates(period);
+  return receipts.filter(r => { const d = new Date(r.date); return d >= start && d <= end; });
+}
+
+function aggregateByCategory(receipts) {
+  const totals = {};
+  receipts.forEach(r => r.items.forEach(item => {
+    const cat = item.category || 'other';
+    totals[cat] = (totals[cat] || 0) + item.total;
+  }));
+  return totals;
+}
+
+// ── Budget tab rendering ──────────────────────────────────────────────────────
+
+function renderBudgetTab() {
+  const budget = getBudget();
+
+  // Populate settings form
+  const period = (budget && budget.period) || 'weekly';
+  document.querySelectorAll('.budget-period-chip').forEach(chip => {
+    chip.classList.toggle('active', chip.dataset.period === period);
+  });
+  const amtInput = document.getElementById('budget-amount-input');
+  if (amtInput && budget && budget.amount) amtInput.value = budget.amount;
+
+  renderBudgetSummary();
+  renderSpendingCategories();
+  renderBudgetRecommendations();
+  renderReceiptHistory();
+}
+
+function renderBudgetSummary() {
+  const el = document.getElementById('budget-summary-content');
+  if (!el) return;
+  const budget = getBudget();
+  const receipts = getReceipts();
+  const period = (budget && budget.period) || 'weekly';
+  const target = budget && budget.amount ? parseFloat(budget.amount) : 0;
+  const periodReceipts = getReceiptsForPeriod(receipts, period);
+  const spent = periodReceipts.reduce((s, r) => s + r.total, 0);
+
+  if (!target) {
+    el.innerHTML = `<div class="budget-summary-empty">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+      <span>Set a spend target above to track your budget progress</span>
+    </div>`;
+    return;
+  }
+
+  const { start, end } = getPeriodDates(period);
+  const now = new Date();
+  const totalMs = end - start;
+  const elapsedMs = Math.min(now - start, totalMs);
+  const daysTotal = Math.round(totalMs / 86400000) + 1;
+  const daysLeft  = Math.max(0, Math.ceil((end - now) / 86400000));
+  const pct = Math.min(100, Math.round(spent / target * 100));
+  const remaining = Math.max(0, target - spent);
+
+  // Pace status
+  const expectedSpend = target * (elapsedMs / totalMs);
+  const paceRatio = expectedSpend > 0 ? spent / expectedSpend : 0;
+  let paceClass = 'budget-pace-ok', paceLabel = 'On track';
+  if (paceRatio > 1.15) { paceClass = 'budget-pace-over'; paceLabel = 'Over pace'; }
+  else if (paceRatio < 0.75 && spent > 0) { paceClass = 'budget-pace-under'; paceLabel = 'Under pace'; }
+
+  const periodLabel = period === 'weekly' ? 'week' : period === 'biweekly' ? '2 weeks' : 'month';
+  const startStr = start.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+  const endStr   = end.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+  const barColor = pct > 90 ? '#EF4444' : pct > 70 ? '#F59E0B' : '#2D9E5F';
+
+  el.innerHTML = `
+    <div class="budget-summary-period">${startStr} – ${endStr} · ${daysTotal}-day ${periodLabel}</div>
+    <div class="budget-summary-amounts">
+      <div class="budget-summary-spent">
+        <span class="budget-summary-spent-amt">$${spent.toFixed(2)}</span>
+        <span class="budget-summary-spent-of"> of $${target.toFixed(0)}</span>
+      </div>
+      <div class="budget-pace-badge ${paceClass}">${paceLabel}</div>
+    </div>
+    <div class="budget-progress-track">
+      <div class="budget-progress-fill" style="width:${pct}%;background:${barColor}"></div>
+    </div>
+    <div class="budget-summary-meta">
+      <span>$${remaining.toFixed(2)} remaining</span>
+      <span>${daysLeft} day${daysLeft !== 1 ? 's' : ''} left</span>
+    </div>
+    ${periodReceipts.length === 0 ? '<div class="budget-summary-hint">Capture a receipt below to start tracking</div>' : ''}
+  `;
+}
+
+function renderSpendingCategories() {
+  const card  = document.getElementById('budget-categories-card');
+  const label = document.getElementById('budget-cats-label');
+  const el    = document.getElementById('budget-categories-content');
+  if (!el) return;
+
+  const budget = getBudget();
+  const period = (budget && budget.period) || 'weekly';
+  const periodReceipts = getReceiptsForPeriod(getReceipts(), period);
+
+  if (periodReceipts.length === 0) {
+    if (card)  card.style.display  = 'none';
+    if (label) label.style.display = 'none';
+    return;
+  }
+  if (card)  card.style.display  = '';
+  if (label) label.style.display = '';
+
+  const catTotals = aggregateByCategory(periodReceipts);
+  const totalSpent = Object.values(catTotals).reduce((s, v) => s + v, 0);
+  const sorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+
+  const CAT_DISPLAY = {
+    produce: 'Produce', dairy: 'Dairy', meat: 'Protein', pantry: 'Pantry',
+    frozen: 'Frozen', beverages: 'Beverages', snacks: 'Snacks',
+    cleaning: 'Household', personal: 'Personal Care', bakery: 'Bakery', specialty: 'Specialty',
+  };
+
+  el.innerHTML = sorted.map(([cat, amt]) => {
+    const pct    = Math.round(amt / totalSpent * 100);
+    const color  = catColor(cat);
+    const label  = CAT_DISPLAY[cat] || cat;
+    const icon   = CATEGORIES[cat]?.icon || '🛒';
+    return `
+      <div class="spending-cat-row">
+        <div class="spending-cat-info">
+          <span class="spending-cat-icon">${icon}</span>
+          <span class="spending-cat-name">${escHtml(label)}</span>
+        </div>
+        <div class="spending-cat-bar-wrap">
+          <div class="spending-cat-bar" style="width:${pct}%;background:${color}"></div>
+        </div>
+        <div class="spending-cat-amounts">
+          <span class="spending-cat-pct">${pct}%</span>
+          <span class="spending-cat-amt">$${amt.toFixed(2)}</span>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function renderBudgetRecommendations() {
+  const listEl = document.getElementById('budget-recs-list');
+  const label  = document.getElementById('budget-recs-label');
+  if (!listEl) return;
+
+  const budget = getBudget();
+  const period = (budget && budget.period) || 'weekly';
+  const allReceipts = getReceipts();
+  const periodReceipts = getReceiptsForPeriod(allReceipts, period);
+  const catTotals = aggregateByCategory(periodReceipts);
+  const totalSpent = Object.values(catTotals).reduce((s, v) => s + v, 0);
+  const target = budget && budget.amount ? parseFloat(budget.amount) : 0;
+
+  const recs = [];
+
+  // 1. Budget pace
+  if (target > 0 && periodReceipts.length > 0) {
+    const { start, end } = getPeriodDates(period);
+    const now = new Date();
+    const totalMs   = end - start;
+    const elapsedMs = Math.min(now - start, totalMs);
+    const expectedSpend = target * (elapsedMs / totalMs);
+    const paceRatio = expectedSpend > 0 ? totalSpent / expectedSpend : 0;
+    if (paceRatio < 0.8) {
+      recs.push({ type: 'positive', icon: '🎯', title: 'Well under pace', text: `You're spending ${Math.round((1 - paceRatio) * 100)}% less than expected for this point in your ${period} budget — great discipline. Consider stocking up on non-perishables now.` });
+    } else if (paceRatio > 1.2) {
+      recs.push({ type: 'warning', icon: '⚠️', title: 'Over budget pace', text: `Spending is running ${Math.round((paceRatio - 1) * 100)}% over pace for this ${period} budget. Focus on essentials and hold off on snacks or beverages to catch up.` });
+    } else {
+      recs.push({ type: 'positive', icon: '✅', title: 'On track', text: `Your ${period} grocery spend is right on pace. You\'re in great shape — keep it up!` });
+    }
+  } else if (target > 0) {
+    recs.push({ type: 'neutral', icon: '📷', title: 'Ready to track', text: `Your $${target}/period budget is set. Capture your first receipt below to start tracking your spend.` });
+  } else {
+    recs.push({ type: 'neutral', icon: '💡', title: 'Set a budget', text: 'Add a spend target above to unlock budget pace tracking and personalized tips.' });
+  }
+
+  // 2. Top spend category
+  const sorted = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+  if (sorted.length > 0) {
+    const [topCat, topAmt] = sorted[0];
+    const pct     = Math.round(topAmt / totalSpent * 100);
+    const catMeta = CATEGORIES[topCat];
+    if (catMeta && catMeta.warehouseSuit === 'high') {
+      recs.push({ type: 'tip', icon: '🏪', title: 'Bulk savings opportunity', text: `${catMeta.name} is your top spend at $${topAmt.toFixed(2)} (${pct}%). Warehouse bulk buying typically saves 25–40% in this category — worth a Costco or Sam's run.` });
+    } else if (catMeta && catMeta.warehouseSuit === 'conditional') {
+      recs.push({ type: 'info', icon: '💡', title: 'Smart buying mix', text: `${catMeta.name} leads your spend at ${pct}%. Mix fresh local buys with selective bulk for the best value on longer-shelf-life items.` });
+    }
+  }
+
+  // 3. Snacks + beverages insight
+  const snackBev = (catTotals['snacks'] || 0) + (catTotals['beverages'] || 0);
+  if (totalSpent > 0 && snackBev / totalSpent > 0.2) {
+    recs.push({ type: 'tip', icon: '🍿', title: 'Bulk wins for beverages & snacks', text: `Snacks and beverages make up ${Math.round(snackBev / totalSpent * 100)}% of your spending. Both categories see outstanding per-unit savings at warehouse clubs.` });
+  }
+
+  // 4. Protein + frozen combo
+  const meatSpend   = catTotals['meat']   || 0;
+  const frozenSpend = catTotals['frozen'] || 0;
+  if (meatSpend > 15 && frozenSpend < 5) {
+    recs.push({ type: 'tip', icon: '❄️', title: 'Extend your protein budget', text: `You spent $${meatSpend.toFixed(2)} on protein. Supplementing with frozen fish, shrimp, or chicken can cut your protein cost by 20–30% with zero nutrition trade-off.` });
+  }
+
+  // 5. Good pantry discipline
+  const pantrySpend = catTotals['pantry'] || 0;
+  if (totalSpent > 30 && pantrySpend > 0 && pantrySpend / totalSpent < 0.12) {
+    recs.push({ type: 'positive', icon: '✨', title: 'Strong pantry management', text: `You\'re keeping pantry spend lean at ${Math.round(pantrySpend / totalSpent * 100)}%. When you do restock, buying staples in bulk delivers some of the best long-term savings.` });
+  }
+
+  if (label) label.style.display = '';
+  listEl.innerHTML = recs.slice(0, 4).map(rec => `
+    <div class="budget-rec-card card">
+      <div class="budget-rec-icon-wrap budget-rec-type-${rec.type}">${rec.icon}</div>
+      <div class="budget-rec-body">
+        <div class="budget-rec-title">${escHtml(rec.title)}</div>
+        <div class="budget-rec-text">${escHtml(rec.text)}</div>
+      </div>
+    </div>`).join('');
+}
+
+function renderReceiptHistory() {
+  const listEl = document.getElementById('budget-receipts-list');
+  const label  = document.getElementById('budget-receipts-label');
+  if (!listEl) return;
+  const receipts = getReceipts();
+  if (receipts.length === 0) {
+    listEl.style.display  = 'none';
+    if (label) label.style.display = 'none';
+    return;
+  }
+  listEl.style.display  = '';
+  if (label) label.style.display = '';
+
+  listEl.innerHTML = `<div class="receipt-history-list">` + receipts.slice(0, 10).map(r => {
+    const d = new Date(r.date);
+    const dateStr  = d.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const itemCount = r.items.length;
+    const catSet = [...new Set(r.items.map(i => i.category))];
+    const catDots = catSet.slice(0, 4).map(c => `<span class="cat-dot-sm" style="background:${catColor(c)};border-radius:50%;display:inline-block;width:8px;height:8px;margin-right:2px"></span>`).join('');
+    return `
+      <div class="receipt-history-item card">
+        <div class="receipt-history-info">
+          <div class="receipt-history-store">${escHtml(r.store)}</div>
+          <div class="receipt-history-meta">${escHtml(dateStr)} &nbsp;·&nbsp; ${itemCount} items &nbsp; ${catDots}</div>
+        </div>
+        <div class="receipt-history-total">$${r.total.toFixed(2)}</div>
+        <button class="receipt-history-del" data-receipt-id="${escHtml(r.id)}" aria-label="Delete receipt" title="Delete">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+        </button>
+      </div>`;
+  }).join('') + `</div>`;
+
+  listEl.querySelectorAll('.receipt-history-del').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = btn.dataset.receiptId;
+      const all = getReceipts().filter(r => r.id !== id);
+      localStorage.setItem(RECEIPTS_KEY, JSON.stringify(all));
+      renderReceiptHistory();
+      renderBudgetSummary();
+      renderSpendingCategories();
+      renderBudgetRecommendations();
+      showToast('Receipt removed');
+    });
+  });
+}
+
+// ── Receipt capture flow ──────────────────────────────────────────────────────
+
+function startReceiptScan(file) {
+  const reader = new FileReader();
+  reader.onload = e => {
+    // Show preview + scanning state
+    document.getElementById('receipt-idle-state').style.display    = 'none';
+    document.getElementById('receipt-scanning-state').style.display = '';
+    document.getElementById('receipt-parsed-state').style.display   = 'none';
+    const img = document.getElementById('receipt-preview-img');
+    if (img) img.src = e.target.result;
+
+    // Simulate AI parse delay
+    setTimeout(() => showParsedReceipt(), 2000);
+  };
+  reader.readAsDataURL(file);
+}
+
+function showParsedReceipt() {
+  // Pick a random template
+  const tpl = RECEIPT_TEMPLATES[Math.floor(Math.random() * RECEIPT_TEMPLATES.length)];
+  const now  = new Date();
+  pendingReceipt = {
+    id:    Date.now().toString(),
+    date:  now.toISOString(),
+    store: tpl.store,
+    items: tpl.items.map(i => ({ ...i })),
+    total: tpl.items.reduce((s, i) => s + i.total, 0),
+  };
+
+  document.getElementById('receipt-scanning-state').style.display = 'none';
+  document.getElementById('receipt-parsed-state').style.display   = '';
+
+  const storeEl = document.getElementById('receipt-parsed-store');
+  const dateEl  = document.getElementById('receipt-parsed-date');
+  const itemsEl = document.getElementById('receipt-parsed-items');
+  const totalEl = document.getElementById('receipt-parsed-total-amt');
+
+  if (storeEl) storeEl.textContent = pendingReceipt.store;
+  if (dateEl)  dateEl.textContent  = now.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) + ' · ' + now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+  if (totalEl) totalEl.textContent = '$' + pendingReceipt.total.toFixed(2);
+
+  if (itemsEl) {
+    itemsEl.innerHTML = pendingReceipt.items.map(item => `
+      <div class="receipt-parsed-item">
+        <span class="cat-dot" style="background:${catColor(item.category)};width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block"></span>
+        <span class="receipt-item-name">${escHtml(item.name)}</span>
+        <span class="receipt-item-qty">${item.qty > 1 ? '×' + item.qty : ''}</span>
+        <span class="receipt-item-total">$${item.total.toFixed(2)}</span>
+      </div>`).join('');
+  }
+}
+
+function confirmReceipt() {
+  if (!pendingReceipt) return;
+  addReceipt(pendingReceipt);
+  pendingReceipt = null;
+  resetReceiptCapture();
+  renderBudgetSummary();
+  renderSpendingCategories();
+  renderBudgetRecommendations();
+  renderReceiptHistory();
+  showToast('Receipt added to budget!');
+}
+
+function resetReceiptCapture() {
+  pendingReceipt = null;
+  document.getElementById('receipt-idle-state').style.display     = '';
+  document.getElementById('receipt-scanning-state').style.display  = 'none';
+  document.getElementById('receipt-parsed-state').style.display    = 'none';
+  // Reset file inputs
+  const cam  = document.getElementById('receipt-camera-input');
+  const upl  = document.getElementById('receipt-upload-input');
+  if (cam) cam.value  = '';
+  if (upl) upl.value  = '';
+  const img = document.getElementById('receipt-preview-img');
+  if (img) img.src = '';
+}
+
+// ── Profile status ────────────────────────────────────────────────────────────
+
+function renderProfileStatus() {
+  const bar          = document.getElementById('profile-status-bar');
+  const saveLabelEl  = document.getElementById('save-profile-btn-label');
+  const saveBtn      = document.getElementById('save-profile-btn');
+  if (!bar) return;
+
+  const profile = getProfile();
+  const hasName = profile?.name?.trim();
+
+  if (!profile || !hasName) {
+    bar.className = 'profile-status-bar profile-status-bar--new';
+    bar.innerHTML = `<div class="container"><div class="profile-status-inner">
+      <div class="profile-status-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+      </div>
+      <div class="profile-status-text">
+        <div class="profile-status-headline">No profile yet</div>
+        <div class="profile-status-sub">Fill in the form below and click <strong>Create Profile</strong> to personalize your SmartCart experience.</div>
+      </div>
+    </div></div>`;
+    bar.style.display = '';
+    if (saveLabelEl) saveLabelEl.textContent = 'Create Profile';
+    if (saveBtn) saveBtn.classList.add('btn-create-profile');
+  } else {
+    const parts = [];
+    const firstName = hasName.split(' ')[0];
+    if (firstName) parts.push(firstName);
+    if (profile.householdSize) parts.push(profile.householdSize + (profile.householdSize === 1 ? ' person' : ' people'));
+    if (profile.zip) parts.push(profile.zip);
+    bar.className = 'profile-status-bar profile-status-bar--active';
+    bar.innerHTML = `<div class="container"><div class="profile-status-inner">
+      <div class="profile-status-icon">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <div class="profile-status-text">
+        <div class="profile-status-headline">Profile active &nbsp;·&nbsp; ${escHtml(parts.join(' · '))}</div>
+        <div class="profile-status-sub">Edit the details below and click <strong>Update Profile</strong> to save changes.</div>
+      </div>
+    </div></div>`;
+    bar.style.display = '';
+    if (saveLabelEl) saveLabelEl.textContent = 'Update Profile';
+    if (saveBtn) saveBtn.classList.remove('btn-create-profile');
+  }
+}
+
 // ─── EVENT WIRING ─────────────────────────────────────────────────────────
 
 // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
@@ -1300,8 +1797,9 @@ function switchTab(tabName) {
   if (panel) panel.style.display = '';
   const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
-  if (tabName === 'saved') renderSavedLists();
-  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); }
+  if (tabName === 'saved')   renderSavedLists();
+  if (tabName === 'budget')  renderBudgetTab();
+  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2440,16 +2938,18 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── Profile tab — save profile button
   document.getElementById('save-profile-btn')?.addEventListener('click', () => {
     const profile = readProfileForm();
+    const isNew = !getProfile()?.name?.trim();
     saveProfile(profile);
     syncProfileToState(profile);
     renderProfileGreeting();
     renderProfileGoalHint();
+    renderProfileStatus();
     const badge = document.getElementById('profile-saved-badge');
     if (badge) {
       badge.style.display = 'flex';
       setTimeout(() => { badge.style.display = 'none'; }, 2500);
     }
-    showToast('Profile saved!');
+    showToast(isNew ? 'Profile created!' : 'Profile updated!');
   });
 
   // ── Profile tab — clear history button
@@ -2477,6 +2977,41 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('profile-goal-hint-dismiss')?.addEventListener('click', () => {
     const hint = document.getElementById('profile-goal-hint');
     if (hint) hint.style.display = 'none';
+  });
+
+  // ── Budget — period chips
+  document.querySelectorAll('.budget-period-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      document.querySelectorAll('.budget-period-chip').forEach(c => c.classList.remove('active'));
+      chip.classList.add('active');
+    });
+  });
+
+  // ── Budget — save budget button
+  document.getElementById('save-budget-btn')?.addEventListener('click', () => {
+    const period = document.querySelector('.budget-period-chip.active')?.dataset.period || 'weekly';
+    const amount = parseFloat(document.getElementById('budget-amount-input')?.value || '0');
+    if (!amount || amount <= 0) { showToast('Enter a spend target amount'); return; }
+    saveBudget({ period, amount });
+    renderBudgetSummary();
+    renderBudgetRecommendations();
+    showToast('Budget saved!');
+  });
+
+  // ── Receipt — file inputs (camera + upload share same handler)
+  function handleReceiptFile(e) {
+    const file = e.target.files && e.target.files[0];
+    if (!file) return;
+    startReceiptScan(file);
+  }
+  document.getElementById('receipt-camera-input')?.addEventListener('change', handleReceiptFile);
+  document.getElementById('receipt-upload-input')?.addEventListener('change', handleReceiptFile);
+
+  // ── Receipt — confirm / discard
+  document.getElementById('btn-confirm-receipt')?.addEventListener('click', confirmReceipt);
+  document.getElementById('btn-cancel-receipt')?.addEventListener('click', () => {
+    resetReceiptCapture();
+    showToast('Receipt discarded');
   });
 
   // ── Init

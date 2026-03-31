@@ -46,6 +46,10 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             Saved Lists
           </button>
+          <button class="nav-tab" data-tab="budget" role="tab" aria-selected="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            Budget
+          </button>
           <button class="nav-tab" data-tab="overview" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             How It Works
@@ -686,6 +690,153 @@
 
 
   <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: BUDGET                                       -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-budget" style="display:none">
+
+    <!-- Hero -->
+    <div class="budget-tab-hero">
+      <div class="container">
+        <div class="budget-tab-hero-inner">
+          <div class="budget-tab-hero-icon">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          </div>
+          <div>
+            <div class="budget-tab-hero-title">Budget &amp; Spending</div>
+            <div class="budget-tab-hero-sub">Track grocery receipts, monitor categories, and get smart savings tips — all saved in your browser</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <main class="main">
+      <div class="container">
+
+        <!-- ── Budget Settings ── -->
+        <div class="budget-block-label">Your Grocery Budget</div>
+        <div class="card budget-settings-card">
+          <div class="budget-settings-row">
+            <div class="budget-period-group">
+              <div class="budget-period-label">Budget period</div>
+              <div class="budget-period-chips">
+                <button class="budget-period-chip active" data-period="weekly">Weekly</button>
+                <button class="budget-period-chip" data-period="biweekly">Bi-weekly</button>
+                <button class="budget-period-chip" data-period="monthly">Monthly</button>
+              </div>
+            </div>
+            <div class="budget-amount-group">
+              <label class="budget-amount-label" for="budget-amount-input">Spend target</label>
+              <div class="budget-amount-input-wrap">
+                <span class="budget-currency">$</span>
+                <input type="number" id="budget-amount-input" class="budget-amount-input" placeholder="150" min="0" max="9999" step="5">
+              </div>
+            </div>
+          </div>
+          <button class="btn-save-budget" id="save-budget-btn">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+            Save Budget
+          </button>
+        </div>
+
+        <!-- ── Receipt Capture ── -->
+        <div class="budget-block-label">Capture a Receipt</div>
+        <div class="card receipt-card" id="receipt-card">
+
+          <!-- Idle: camera/upload prompt -->
+          <div class="receipt-idle-state" id="receipt-idle-state">
+            <div class="receipt-camera-zone">
+              <div class="receipt-camera-bg">
+                <svg class="receipt-camera-svg" width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                <div class="receipt-camera-prompt">Point your camera at a grocery receipt</div>
+                <div class="receipt-camera-hint">SmartCart reads items, categories &amp; prices automatically</div>
+              </div>
+              <div class="receipt-capture-actions">
+                <label class="btn-take-photo" for="receipt-camera-input">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+                  Take Photo
+                </label>
+                <input type="file" id="receipt-camera-input" accept="image/*" capture="environment" style="display:none" aria-label="Take photo of receipt">
+                <label class="btn-upload-photo" for="receipt-upload-input">
+                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                  Upload Photo
+                </label>
+                <input type="file" id="receipt-upload-input" accept="image/*" style="display:none" aria-label="Upload receipt photo">
+              </div>
+            </div>
+          </div>
+
+          <!-- Scanning state -->
+          <div class="receipt-scanning-state" id="receipt-scanning-state" style="display:none">
+            <div class="receipt-preview-wrap">
+              <img id="receipt-preview-img" class="receipt-preview-img" src="" alt="Receipt preview">
+              <div class="receipt-scan-overlay">
+                <div class="receipt-scan-line"></div>
+              </div>
+            </div>
+            <div class="receipt-scanning-info">
+              <div class="receipt-scanning-dots"><span></span><span></span><span></span></div>
+              <div class="receipt-scanning-label">Reading your receipt…</div>
+              <div class="receipt-scanning-sub">Identifying items, categories &amp; prices</div>
+            </div>
+          </div>
+
+          <!-- Parsed state -->
+          <div class="receipt-parsed-state" id="receipt-parsed-state" style="display:none">
+            <div class="receipt-parsed-header">
+              <div>
+                <div class="receipt-parsed-store" id="receipt-parsed-store">Receipt Scanned</div>
+                <div class="receipt-parsed-date" id="receipt-parsed-date"></div>
+              </div>
+              <div class="receipt-parsed-badge">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                Scanned
+              </div>
+            </div>
+            <div class="receipt-parsed-items" id="receipt-parsed-items"></div>
+            <div class="receipt-parsed-footer">
+              <div class="receipt-parsed-total-row">
+                <span class="receipt-parsed-total-label">Receipt total</span>
+                <span class="receipt-parsed-total-amt" id="receipt-parsed-total-amt"></span>
+              </div>
+              <div class="receipt-parsed-actions">
+                <button class="btn-confirm-receipt" id="btn-confirm-receipt">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  Add to Budget
+                </button>
+                <button class="btn-cancel-receipt" id="btn-cancel-receipt">Discard</button>
+              </div>
+            </div>
+          </div>
+
+        </div><!-- /receipt-card -->
+
+        <!-- ── This Period Summary ── -->
+        <div class="budget-block-label">This Period</div>
+        <div class="card budget-summary-card" id="budget-summary-card">
+          <div id="budget-summary-content"><!-- rendered by JS --></div>
+        </div>
+
+        <!-- ── Spending by Category ── -->
+        <div class="budget-block-label" id="budget-cats-label" style="display:none">Spending by Category</div>
+        <div class="card budget-categories-card" id="budget-categories-card" style="display:none">
+          <div id="budget-categories-content"></div>
+        </div>
+
+        <!-- ── Smart Tips ── -->
+        <div class="budget-block-label" id="budget-recs-label">Smart Tips</div>
+        <div id="budget-recs-list"><!-- rendered by JS --></div>
+
+        <!-- ── Recent Receipts ── -->
+        <div class="budget-block-label" id="budget-receipts-label" style="display:none">Receipt History</div>
+        <div id="budget-receipts-list" style="display:none"><!-- rendered by JS --></div>
+
+      </div>
+    </main>
+
+  </div><!-- /tab-budget -->
+
+
+  <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: PROFILE                                      -->
   <!-- ══════════════════════════════════════════════════ -->
   <div class="tab-panel" id="tab-profile" style="display:none">
@@ -704,6 +855,8 @@
         </div>
       </div>
     </div>
+    <!-- Profile Status Bar -->
+    <div id="profile-status-bar" class="profile-status-bar" style="display:none"></div>
 
     <main class="main">
       <div class="container">
@@ -869,7 +1022,7 @@
           <div class="profile-save-row">
             <button class="btn-generate" id="save-profile-btn">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save Profile
+              <span id="save-profile-btn-label">Save Profile</span>
             </button>
             <span class="profile-saved-badge" id="profile-saved-badge" style="display:none">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
