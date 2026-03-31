@@ -1047,6 +1047,317 @@ function generateInsights(analysis, householdSize, locationInfo, hasMembership) 
 
 // ─── EVENT WIRING ─────────────────────────────────────────────────────────
 
+// ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-panel').forEach(p => { p.style.display = 'none'; });
+  document.querySelectorAll('.nav-tab').forEach(t => {
+    t.classList.remove('active');
+    t.setAttribute('aria-selected', 'false');
+  });
+  const panel = document.getElementById('tab-' + tabName);
+  if (panel) panel.style.display = '';
+  const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
+  if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
+  if (tabName === 'saved') renderSavedLists();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+// ─── SAVED LISTS ─────────────────────────────────────────────────────────────
+
+function getSavedLists() {
+  try { return JSON.parse(localStorage.getItem('smartcart_lists') || '[]'); } catch (e) { return []; }
+}
+
+function persistLists(lists) {
+  localStorage.setItem('smartcart_lists', JSON.stringify(lists));
+}
+
+function saveListAs(name) {
+  if (!name.trim() || state.groceryList.length === 0) return null;
+  const lists = getSavedLists();
+  const existingIdx = lists.findIndex(l => l.name.toLowerCase() === name.toLowerCase().trim());
+  const entry = {
+    id: existingIdx >= 0 ? lists[existingIdx].id : Date.now().toString(),
+    name: name.trim(),
+    items: state.groceryList.map(i => ({ name: i.name, quantity: i.quantity })),
+    savedAt: new Date().toISOString(),
+  };
+  if (existingIdx >= 0) { lists[existingIdx] = entry; } else { lists.unshift(entry); }
+  persistLists(lists);
+  return entry;
+}
+
+function deleteList(id) {
+  if (!confirm('Delete this saved list?')) return;
+  persistLists(getSavedLists().filter(l => l.id !== id));
+  renderSavedLists();
+}
+
+function loadList(id) {
+  const list = getSavedLists().find(l => l.id === id);
+  if (!list) return;
+  state.groceryList = list.items.map(i => ({ name: i.name, quantity: i.quantity, id: state.nextId++, catalogItem: findExactItem(i.name) || null }));
+  renderList();
+  switchTab('optimizer');
+  setTimeout(() => { const s = document.getElementById('section-list'); if (s) s.scrollIntoView({ behavior: 'smooth' }); }, 320);
+  showToast(`"${list.name}" loaded — ${list.items.length} items`);
+}
+
+function renderSavedLists() {
+  const lists = getSavedLists();
+  const container = document.getElementById('saved-lists-container');
+  const empty = document.getElementById('saved-empty');
+  if (!container) return;
+  if (lists.length === 0) {
+    if (empty) empty.style.display = '';
+    container.innerHTML = '';
+    return;
+  }
+  if (empty) empty.style.display = 'none';
+  container.innerHTML = lists.map(l => {
+    const date = new Date(l.savedAt).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    const count = l.items.length;
+    const preview = l.items.slice(0, 5).map(i => escHtml(i.name)).join(', ') + (l.items.length > 5 ? ` +${l.items.length - 5} more` : '');
+    return `
+      <div class="saved-list-card card fade-in">
+        <div class="saved-list-info">
+          <div class="saved-list-name">${escHtml(l.name)}</div>
+          <div class="saved-list-meta">${count} item${count !== 1 ? 's' : ''} &nbsp;·&nbsp; Saved ${date}</div>
+          <div class="saved-list-preview">${preview}</div>
+        </div>
+        <div class="saved-list-actions">
+          <button class="btn-load-list" onclick="loadList('${escHtml(l.id)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            Load
+          </button>
+          <button class="btn-delete-list" onclick="deleteList('${escHtml(l.id)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+            Delete
+          </button>
+        </div>
+      </div>`;
+  }).join('');
+}
+
+function escHtml(str) {
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+// ─── TOAST ───────────────────────────────────────────────────────────────────
+
+function showToast(msg) {
+  let toast = document.getElementById('sc-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'sc-toast';
+    toast.className = 'sc-toast';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.classList.add('visible');
+  clearTimeout(toast._hideTimer);
+  toast._hideTimer = setTimeout(() => toast.classList.remove('visible'), 2600);
+}
+
+// ─── FITNESS GOALS ────────────────────────────────────────────────────────────
+
+const GOAL_PROFILES = {
+  weightLoss: {
+    keywords: ['lose weight', 'weight loss', 'lose', 'slim', 'diet', 'calorie deficit', 'cut calories', 'fat loss', 'drop weight', 'pounds'],
+    items: [
+      { name: 'Chicken Breast', qty: 3 }, { name: 'Spinach', qty: 2 }, { name: 'Broccoli', qty: 2 },
+      { name: 'Greek Yogurt', qty: 4 }, { name: 'Eggs', qty: 2 }, { name: 'Almonds', qty: 1 },
+      { name: 'Carrots', qty: 2 }, { name: 'Blueberries', qty: 1 }, { name: 'Apples', qty: 1 },
+      { name: 'Ground Turkey', qty: 2 }, { name: 'Oatmeal', qty: 1 }, { name: 'Cucumbers', qty: 2 },
+    ],
+    mealPrep: [
+      'Grilled chicken breast with steamed broccoli and roasted carrots',
+      'Overnight oats with blueberries and a drizzle of honey',
+      'Turkey lettuce wraps with spinach and cucumber',
+      'Greek yogurt parfait with fresh fruit',
+    ],
+    snacks: [
+      'Apple slices with 1 tbsp almond butter',
+      'Greek yogurt (plain, no added sugar)',
+      'Carrot sticks with hummus',
+      'Hard-boiled eggs (2)',
+      'A small handful of almonds (~22 nuts)',
+    ],
+    headline: 'Weight Loss Plan', badge: '🥗',
+    tip: 'Focus on lean protein and fiber-rich vegetables to stay full while maintaining a calorie deficit.',
+  },
+  muscleGain: {
+    keywords: ['build muscle', 'gain muscle', 'bulk', 'bulking', 'muscle mass', 'high protein', 'muscle building', 'bodybuilding', 'strength', 'protein intake', 'gain weight'],
+    items: [
+      { name: 'Chicken Breast', qty: 4 }, { name: 'Eggs', qty: 2 }, { name: 'Canned Tuna', qty: 6 },
+      { name: 'Greek Yogurt', qty: 4 }, { name: 'Oatmeal', qty: 1 }, { name: 'Rice', qty: 3 },
+      { name: 'Broccoli', qty: 2 }, { name: 'Spinach', qty: 1 }, { name: 'Olive Oil', qty: 1 },
+      { name: 'Almonds', qty: 1 }, { name: 'Ground Beef', qty: 2 }, { name: 'Butter', qty: 1 },
+    ],
+    mealPrep: [
+      'Chicken and rice bowls with steamed broccoli (prep 5 servings)',
+      'Ground beef stir-fry with rice and spinach',
+      'Scrambled eggs with spinach and cheese on the side',
+      'Tuna pasta with olive oil, garlic, and herbs',
+    ],
+    snacks: [
+      'Greek yogurt with granola and berries',
+      'Hard-boiled eggs (2–3)',
+      'Almonds and a banana',
+      'Tuna on whole grain crackers',
+      'Oatmeal with milk and a spoonful of nut butter',
+    ],
+    headline: 'Muscle Building Plan', badge: '💪',
+    tip: 'Prioritize protein at every meal (aim for 0.7–1g per lb of bodyweight). Rice and oats provide the sustained energy your training demands.',
+  },
+  cutting: {
+    keywords: ['cutting', 'lean out', 'get lean', 'shred', 'shredded', 'cut phase', 'reduce body fat', 'low calorie high protein', 'competition prep'],
+    items: [
+      { name: 'Chicken Breast', qty: 4 }, { name: 'Eggs', qty: 2 }, { name: 'Spinach', qty: 2 },
+      { name: 'Broccoli', qty: 3 }, { name: 'Carrots', qty: 2 }, { name: 'Cucumbers', qty: 2 },
+      { name: 'Greek Yogurt', qty: 4 }, { name: 'Canned Tuna', qty: 6 }, { name: 'Almonds', qty: 1 },
+      { name: 'Ground Turkey', qty: 2 }, { name: 'Bell Peppers', qty: 3 }, { name: 'Celery', qty: 1 },
+    ],
+    mealPrep: [
+      'Chicken breast with roasted bell peppers and broccoli',
+      'Tuna salad on a bed of fresh spinach (no mayo)',
+      'Turkey and veggie stir-fry with minimal oil',
+      'Egg white scramble with spinach and mushrooms',
+    ],
+    snacks: [
+      'Cucumber slices and cherry tomatoes',
+      'Hard-boiled eggs (2)',
+      'Celery with a small amount of almond butter',
+      'Greek yogurt (plain, 0% fat)',
+      'A handful of raw almonds',
+    ],
+    headline: 'Cutting / Fat Loss Plan', badge: '🔥',
+    tip: 'Keep carbs low, protein high, and lean on fibrous vegetables to fill your plate without exceeding your calorie target.',
+  },
+  mealPrep: {
+    keywords: ['meal prep', 'batch cook', 'prep meals', 'food prep', 'prep for the week', 'weekly prep', 'cook ahead', 'prep sunday'],
+    items: [
+      { name: 'Chicken Breast', qty: 4 }, { name: 'Rice', qty: 3 }, { name: 'Broccoli', qty: 3 },
+      { name: 'Eggs', qty: 2 }, { name: 'Spinach', qty: 2 }, { name: 'Oatmeal', qty: 1 },
+      { name: 'Greek Yogurt', qty: 4 }, { name: 'Carrots', qty: 2 }, { name: 'Olive Oil', qty: 1 },
+      { name: 'Canned Beans', qty: 4 }, { name: 'Ground Turkey', qty: 2 }, { name: 'Frozen Vegetables', qty: 3 },
+    ],
+    mealPrep: [
+      'Classic chicken + rice + broccoli bowls (make 5 for the week)',
+      'Turkey and bean chili — batch and freeze in portions',
+      'Sheet-pan roasted vegetables with olive oil and garlic',
+      'Overnight oats in mason jars (prep 5 jars at once)',
+    ],
+    snacks: [
+      'Pre-portioned almonds in snack bags',
+      'Cut vegetables (carrots, celery, peppers) in fridge containers',
+      'Greek yogurt cups',
+      'Hard-boiled eggs (batch cook 6–8)',
+      'Fruit containers with berries or apple slices',
+    ],
+    headline: 'Weekly Meal Prep Plan', badge: '📦',
+    tip: 'Block 2–3 hours on Sunday. Cook grains and proteins in bulk; store in portioned containers for easy grab-and-go meals all week.',
+  },
+  keto: {
+    keywords: ['keto', 'ketogenic', 'low carb', 'no carb', 'carnivore', 'ketosis', 'keto diet', 'high fat low carb'],
+    items: [
+      { name: 'Eggs', qty: 2 }, { name: 'Bacon', qty: 2 }, { name: 'Butter', qty: 1 },
+      { name: 'Chicken Breast', qty: 3 }, { name: 'Ground Beef', qty: 3 }, { name: 'Steak', qty: 2 },
+      { name: 'Spinach', qty: 2 }, { name: 'Broccoli', qty: 2 }, { name: 'Avocados', qty: 5 },
+      { name: 'Shredded Cheese', qty: 2 }, { name: 'Heavy Cream', qty: 1 }, { name: 'Almonds', qty: 1 },
+    ],
+    mealPrep: [
+      'Bacon and egg scramble with sautéed spinach',
+      'Ground beef patties with avocado and cheese (no bun)',
+      'Sheet-pan chicken thighs with roasted broccoli',
+      'Steak strips with butter-sautéed mushrooms and greens',
+    ],
+    snacks: [
+      'Cheese slices (cheddar, mozzarella)',
+      'Avocado halves with salt and pepper',
+      'Almonds or macadamia nuts',
+      'Hard-boiled eggs',
+      'Bacon strips',
+    ],
+    headline: 'Keto / Low-Carb Plan', badge: '🥑',
+    tip: "Aim for under 20g net carbs per day. Fat is your fuel — don't fear butter, cheese, and fatty cuts of meat.",
+  },
+  healthyEating: {
+    keywords: ['healthy', 'balanced', 'nutritious', 'whole foods', 'clean eating', 'wellness', 'better eating', 'eat better', 'wholesome', 'well rounded'],
+    items: [
+      { name: 'Spinach', qty: 2 }, { name: 'Broccoli', qty: 2 }, { name: 'Carrots', qty: 2 },
+      { name: 'Apples', qty: 1 }, { name: 'Blueberries', qty: 1 }, { name: 'Eggs', qty: 2 },
+      { name: 'Chicken Breast', qty: 2 }, { name: 'Oatmeal', qty: 1 }, { name: 'Rice', qty: 2 },
+      { name: 'Olive Oil', qty: 1 }, { name: 'Greek Yogurt', qty: 4 }, { name: 'Almonds', qty: 1 },
+    ],
+    mealPrep: [
+      'Grain bowls with roasted vegetables and a lean protein',
+      'Overnight oats with blueberries and almonds',
+      'Baked chicken breast with a side salad',
+      'Stir-fried vegetables with eggs and brown rice',
+    ],
+    snacks: [
+      'Fresh fruit with nut butter',
+      'Greek yogurt with a handful of granola',
+      'Carrots and cucumber with hummus',
+      'A small handful of almonds',
+      'Apple slices',
+    ],
+    headline: 'Balanced Healthy Eating Plan', badge: '🌿',
+    tip: 'Fill half your plate with vegetables, a quarter with lean protein, and a quarter with whole grains for a simple, balanced approach.',
+  },
+};
+
+function parseGoal(text) {
+  const lower = text.toLowerCase();
+  let best = null;
+  let bestScore = 0;
+  for (const [key, profile] of Object.entries(GOAL_PROFILES)) {
+    let score = 0;
+    for (const kw of profile.keywords) {
+      if (lower.includes(kw)) score += kw.split(' ').length;
+    }
+    if (score > bestScore) { bestScore = score; best = { key, ...profile }; }
+  }
+  return best || { key: 'healthyEating', ...GOAL_PROFILES.healthyEating };
+}
+
+function renderGoalSuggestions(goal, goalText) {
+  const results = document.getElementById('goal-results');
+  const banner = document.getElementById('goal-banner');
+  const truncated = goalText.length > 90 ? goalText.slice(0, 90) + '…' : goalText;
+  banner.innerHTML = `
+    <div class="goal-banner-inner">
+      <div class="goal-banner-badge">${goal.badge}</div>
+      <div class="goal-banner-content">
+        <div class="goal-banner-title">${escHtml(goal.headline)}</div>
+        <div class="goal-banner-sub">"${escHtml(truncated)}"</div>
+      </div>
+    </div>
+    <div class="goal-tip">${escHtml(goal.tip)}</div>`;
+
+  document.getElementById('goal-items-list').innerHTML = `
+    <div class="goal-items-list">
+      ${goal.items.map(item => `
+        <label class="goal-item-check">
+          <input type="checkbox" class="goal-item-checkbox" data-name="${escHtml(item.name)}" data-qty="${item.qty}" checked>
+          <span class="goal-item-name">${escHtml(item.name)}</span>
+          <span class="goal-item-qty">×${item.qty}</span>
+        </label>`).join('')}
+    </div>`;
+
+  document.getElementById('meal-prep-ideas').innerHTML = goal.mealPrep.map(idea =>
+    `<div class="idea-item"><span class="idea-dot"></span><span>${escHtml(idea)}</span></div>`).join('');
+  document.getElementById('snack-ideas').innerHTML = goal.snacks.map(snack =>
+    `<div class="idea-item"><span class="idea-dot"></span><span>${escHtml(snack)}</span></div>`).join('');
+
+  results.style.display = '';
+  setTimeout(() => results.scrollIntoView({ behavior: 'smooth', block: 'start' }), 50);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 document.addEventListener('DOMContentLoaded', () => {
 
   // ── Household size
@@ -1226,6 +1537,126 @@ document.addEventListener('DOMContentLoaded', () => {
     renderList();
     el('section-results').style.display = 'none';
     el('section-profile').scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+
+  // ── Tab navigation
+  document.querySelectorAll('.nav-tab').forEach(tab => {
+    tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+  });
+
+  // ── [data-goto-tab] buttons (overview CTAs, empty state links, etc.)
+  document.addEventListener('click', e => {
+    const btn = e.target.closest('[data-goto-tab]');
+    if (btn) switchTab(btn.dataset.gotoTab);
+  });
+
+  // ── Save list bar (in optimizer tab)
+  const saveListBtn = document.getElementById('save-list-btn');
+  const saveListBar = document.getElementById('save-list-bar');
+  const saveListName = document.getElementById('save-list-name');
+  const saveConfirmBtn = document.getElementById('save-confirm-btn');
+  const saveCancelBtn = document.getElementById('save-cancel-btn');
+
+  saveListBtn?.addEventListener('click', () => {
+    if (state.groceryList.length === 0) return;
+    const open = saveListBar.style.display !== 'none' && saveListBar.style.display !== '';
+    saveListBar.style.display = open ? 'none' : '';
+    if (!open) saveListName.focus();
+  });
+
+  function doSaveList(name) {
+    const trimmed = name.trim();
+    if (!trimmed) { saveListName.focus(); return; }
+    const existing = getSavedLists().find(l => l.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing && !confirm(`A list named "${existing.name}" already exists. Overwrite it?`)) return;
+    saveListAs(trimmed);
+    saveListBar.style.display = 'none';
+    saveListName.value = '';
+    showToast('List saved!');
+  }
+
+  saveConfirmBtn?.addEventListener('click', () => doSaveList(saveListName?.value || ''));
+  saveCancelBtn?.addEventListener('click', () => {
+    saveListBar.style.display = 'none';
+    if (saveListName) saveListName.value = '';
+  });
+  saveListName?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSaveList(saveListName.value);
+    if (e.key === 'Escape') saveCancelBtn?.click();
+  });
+
+  // ── Save current list (from Saved Lists tab)
+  const saveCurrentBtn = document.getElementById('save-current-btn');
+  const saveForm = document.getElementById('save-form');
+  const saveNameInput = document.getElementById('save-name-input');
+  const saveSubmitBtn = document.getElementById('save-submit-btn');
+  const saveFormCancel = document.getElementById('save-form-cancel');
+  const noCurrentNote = document.getElementById('no-current-list-note');
+
+  saveCurrentBtn?.addEventListener('click', () => {
+    if (state.groceryList.length === 0) {
+      if (noCurrentNote) { noCurrentNote.style.display = ''; setTimeout(() => { noCurrentNote.style.display = 'none'; }, 4000); }
+      return;
+    }
+    const open = saveForm?.style.display !== 'none' && saveForm?.style.display !== '';
+    if (saveForm) saveForm.style.display = open ? 'none' : '';
+    if (!open && saveNameInput) saveNameInput.focus();
+  });
+
+  function doSaveCurrentList(name) {
+    const trimmed = name.trim();
+    if (!trimmed) { saveNameInput?.focus(); return; }
+    const existing = getSavedLists().find(l => l.name.toLowerCase() === trimmed.toLowerCase());
+    if (existing && !confirm(`A list named "${existing.name}" already exists. Overwrite it?`)) return;
+    saveListAs(trimmed);
+    if (saveForm) saveForm.style.display = 'none';
+    if (saveNameInput) saveNameInput.value = '';
+    renderSavedLists();
+    showToast('List saved!');
+  }
+
+  saveSubmitBtn?.addEventListener('click', () => doSaveCurrentList(saveNameInput?.value || ''));
+  saveFormCancel?.addEventListener('click', () => {
+    if (saveForm) saveForm.style.display = 'none';
+    if (saveNameInput) saveNameInput.value = '';
+  });
+  saveNameInput?.addEventListener('keydown', e => {
+    if (e.key === 'Enter') doSaveCurrentList(saveNameInput.value);
+    if (e.key === 'Escape') saveFormCancel?.click();
+  });
+
+  // ── Fitness goals — generate
+  document.getElementById('generate-btn')?.addEventListener('click', () => {
+    const text = (document.getElementById('goal-input')?.value || '').trim();
+    if (!text) { document.getElementById('goal-input')?.focus(); return; }
+    const goal = parseGoal(text);
+    renderGoalSuggestions(goal, text);
+  });
+
+  // ── Fitness goals — example pills
+  document.querySelectorAll('.goal-example-pill').forEach(pill => {
+    pill.addEventListener('click', () => {
+      const input = document.getElementById('goal-input');
+      if (input) input.value = pill.dataset.goal;
+      document.getElementById('generate-btn')?.click();
+    });
+  });
+
+  // ── Fitness goals — add to optimizer
+  document.getElementById('add-to-optimizer-btn')?.addEventListener('click', () => {
+    const checked = document.querySelectorAll('.goal-item-checkbox:checked');
+    let added = 0;
+    checked.forEach(cb => {
+      const name = cb.dataset.name;
+      const qty = parseInt(cb.dataset.qty, 10) || 1;
+      if (!state.groceryList.some(i => i.name.toLowerCase() === name.toLowerCase())) {
+        addItem(name, qty);
+        added++;
+      }
+    });
+    switchTab('optimizer');
+    setTimeout(() => { const s = document.getElementById('section-list'); if (s) s.scrollIntoView({ behavior: 'smooth' }); }, 320);
+    if (added > 0) showToast(`${added} item${added !== 1 ? 's' : ''} added to your list`);
   });
 
   // ── Init
