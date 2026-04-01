@@ -2494,6 +2494,24 @@ body {
   max-width: 580px;
   margin-bottom: 28px;
 }
+.overview-feature-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 28px;
+  padding: 0;
+  list-style: none;
+}
+.overview-feature-pill {
+  background: rgba(255,255,255,0.12);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 8px 14px;
+  border-radius: var(--radius-full);
+  letter-spacing: 0.01em;
+}
 .btn-overview-cta {
   display: inline-flex;
   align-items: center;
@@ -2554,6 +2572,7 @@ body {
 .feature-icon-green { background: var(--primary-pale); color: var(--primary); }
 .feature-icon-blue  { background: var(--blue-light);   color: var(--blue); }
 .feature-icon-amber { background: var(--gold-light);   color: var(--gold); }
+.feature-icon-sunset { background: var(--accent-light); color: var(--accent); }
 
 .feature-card-title {
   font-size: 16px;
@@ -2749,6 +2768,9 @@ body {
     gap: 20px;
   }
   .how-step-connector { display: none; }
+
+  .overview-feature-list { gap: 8px; }
+  .overview-feature-pill { font-size: 12px; padding: 7px 12px; }
 
   .goal-ideas-grid { grid-template-columns: 1fr; }
   .goal-items-header { flex-direction: column; align-items: flex-start; }

@@ -30,13 +30,13 @@
         </button>
       </div>
       <div class="mobile-nav-row">
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation" aria-controls="mobile-sidebar" aria-expanded="false">
+        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open menu" aria-controls="mobile-sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
-          <span>Open navigation</span>
+          <span>Menu</span>
         </button>
       </div>
     </div>
@@ -578,6 +578,13 @@
           <div class="overview-badge">Free &nbsp;·&nbsp; No account needed &nbsp;·&nbsp; 100% local & private</div>
           <h1 class="overview-title">The Smart Way to Grocery Shop</h1>
           <p class="overview-desc">SmartCart is your personal grocery strategist — comparing warehouse club vs. local prices, factoring in household size, location, and perishability to tell you exactly where to buy every item on your list.</p>
+          <div class="overview-feature-list">
+            <div class="overview-feature-pill">Persistent profile &amp; saved lists</div>
+            <div class="overview-feature-pill">Goal-based planner chat</div>
+            <div class="overview-feature-pill">Warehouse vs. local optimizer</div>
+            <div class="overview-feature-pill">Photo-style receipt capture</div>
+            <div class="overview-feature-pill">Budget &amp; savings insights</div>
+          </div>
           <button class="btn-overview-cta" data-goto-tab="goals">Start Planning →</button>
         </div>
       </div>
@@ -592,12 +599,12 @@
           <div class="feature-grid">
 
             <div class="feature-card">
-              <div class="feature-card-icon feature-icon-green">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+              <div class="feature-card-icon feature-icon-amber">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
               </div>
-              <h3 class="feature-card-title">Price Optimizer</h3>
-              <p class="feature-card-desc">Enter your grocery list and get a complete basket strategy — warehouse club vs. local grocery, item by item. Accounts for bulk waste, household size, location pricing, and trip value.</p>
-              <button class="feature-card-btn" data-goto-tab="optimizer">Try the Optimizer</button>
+              <h3 class="feature-card-title">Profile &amp; Saved Lists</h3>
+              <p class="feature-card-desc">Capture your household size, ZIP, membership, and preferences once — SmartCart remembers it all locally, along with saved grocery lists and planner history.</p>
+              <button class="feature-card-btn" data-goto-tab="profile">Open Profile</button>
             </div>
 
             <div class="feature-card">
@@ -605,17 +612,26 @@
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1"/><path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
               </div>
               <h3 class="feature-card-title">Fitness Goal Planner</h3>
-              <p class="feature-card-desc">Describe your goal — lose weight, build muscle, meal prep, keto — and get a practical shopping list with specific meal prep recipes and smart snack ideas, ready to optimize.</p>
+              <p class="feature-card-desc">Describe any goal — cut calories, bulk up, meal prep, balance macros — and SmartCart will build a grounded grocery list with recipes, snacks, and iterative refinements.</p>
               <button class="feature-card-btn" data-goto-tab="goals">Set a Fitness Goal</button>
             </div>
 
             <div class="feature-card">
-              <div class="feature-card-icon feature-icon-amber">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              <div class="feature-card-icon feature-icon-green">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
               </div>
-              <h3 class="feature-card-title">Saved Lists</h3>
-              <p class="feature-card-desc">Save your shopping lists locally in your browser. Name them, load them on future visits, update them as your needs change, or delete ones you no longer need. No account required.</p>
-              <button class="feature-card-btn" data-goto-tab="profile">View Saved Lists</button>
+              <h3 class="feature-card-title">Price Optimizer</h3>
+              <p class="feature-card-desc">Send any list to the optimizer to see exactly what belongs in the warehouse cart vs. the local store. Built-in logic for perishability, trip value, and membership ROI.</p>
+              <button class="feature-card-btn" data-goto-tab="optimizer">Try the Optimizer</button>
+            </div>
+
+            <div class="feature-card">
+              <div class="feature-card-icon feature-icon-sunset">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/><path d="M9 15h.01"/><path d="M13 15h2"/></svg>
+              </div>
+              <h3 class="feature-card-title">Budget &amp; Receipts</h3>
+              <p class="feature-card-desc">Track recurring spend targets, snap photo-style receipts, auto-tag categories, and get savings nudges — all saved privately in your browser storage.</p>
+              <button class="feature-card-btn" data-goto-tab="budget">Open Budget</button>
             </div>
 
           </div>
