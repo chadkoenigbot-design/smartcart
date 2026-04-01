@@ -1403,6 +1403,75 @@ function resumeSession(id) {
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
+// ─── SAVED GOALS ─────────────────────────────────────────────────────────────
+
+const SAVED_GOALS_KEY = 'smartcart_saved_goals';
+
+function getSavedGoals() {
+  try { return JSON.parse(localStorage.getItem(SAVED_GOALS_KEY) || '[]'); } catch (e) { return []; }
+}
+
+function persistSavedGoals(goals) {
+  localStorage.setItem(SAVED_GOALS_KEY, JSON.stringify(goals));
+}
+
+function renderSavedGoals() {
+  const listEl = document.getElementById('saved-goals-list');
+  const emptyEl = document.getElementById('saved-goals-empty');
+  if (!listEl || !emptyEl) return;
+  const goals = getSavedGoals();
+  if (goals.length === 0) {
+    listEl.innerHTML = '';
+    emptyEl.style.display = '';
+    return;
+  }
+  emptyEl.style.display = 'none';
+  listEl.innerHTML = goals.map(g => {
+    const preview = g.text.length > 80 ? g.text.slice(0, 80) + '\u2026' : g.text;
+    return `<div class="saved-goal-entry" data-goal-id="${escHtml(g.id)}">
+      <div class="saved-goal-info">
+        <div class="saved-goal-name">${escHtml(g.name)}</div>
+        <div class="saved-goal-preview">${escHtml(preview)}</div>
+      </div>
+      <div class="saved-goal-actions">
+        <button class="btn-use-goal" data-goal-id="${escHtml(g.id)}">Use</button>
+        <button class="btn-delete-goal" data-goal-id="${escHtml(g.id)}">Delete</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function saveCurrentGoal(name) {
+  const trimmed = (name || '').trim();
+  if (!trimmed) return;
+  const text = (document.getElementById('goal-input')?.value || '').trim();
+  if (!text) { showToast('Write a goal in the planner first'); return; }
+  const goals = getSavedGoals();
+  goals.unshift({ id: Date.now().toString(), name: trimmed, text, createdAt: new Date().toISOString() });
+  persistSavedGoals(goals);
+  renderSavedGoals();
+  showToast('Goal saved!');
+}
+
+function deleteSavedGoal(id) {
+  const goals = getSavedGoals().filter(g => g.id !== id);
+  persistSavedGoals(goals);
+  renderSavedGoals();
+  showToast('Goal deleted');
+}
+
+function useSavedGoal(id) {
+  const goal = getSavedGoals().find(g => g.id === id);
+  if (!goal) return;
+  const input = document.getElementById('goal-input');
+  if (input) {
+    input.value = goal.text;
+    input.focus();
+  }
+  const section = document.getElementById('profile-planner-section');
+  if (section) section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
 // ─── BUDGET & RECEIPTS ───────────────────────────────────────────────────────
 
 const BUDGET_KEY   = 'smartcart_budget';
@@ -2019,7 +2088,11 @@ function closeMobileNav() {
 
 // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
 
-function switchTab(tabName) {
+function switchTab(tabName, scrollTarget) {
+  if (tabName === 'goals' || tabName === 'saved') {
+    switchTab('profile', tabName === 'goals' ? 'profile-planner-section' : scrollTarget);
+    return;
+  }
   document.querySelectorAll('.tab-panel').forEach(p => { p.style.display = 'none'; });
   document.querySelectorAll('.nav-tab').forEach(t => {
     t.classList.remove('active');
@@ -2029,11 +2102,17 @@ function switchTab(tabName) {
   if (panel) panel.style.display = '';
   const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
-  if (tabName === 'saved')   { switchTab('profile'); return; }
   if (tabName === 'budget')  renderBudgetTab();
-  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); renderSavedLists(); }
+  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); renderSavedLists(); renderSavedGoals(); }
   closeMobileNav();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (scrollTarget) {
+    setTimeout(() => {
+      const el = document.getElementById(scrollTarget);
+      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }, 80);
+  } else {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
 }
 
 // ─── SAVED LISTS ─────────────────────────────────────────────────────────────
@@ -2117,7 +2196,7 @@ function showGoalEditingBanner(listName) {
     banner = document.createElement('div');
     banner.id = 'goal-editing-banner';
     banner.className = 'goal-editing-banner';
-    const goalsMain = document.querySelector('#tab-goals .main');
+    const goalsMain = document.getElementById('profile-planner-section');
     if (goalsMain) goalsMain.insertBefore(banner, goalsMain.firstChild);
   }
   banner.innerHTML = `
@@ -3001,7 +3080,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // ── [data-goto-tab] buttons (overview CTAs, empty state links, etc.)
   document.addEventListener('click', e => {
     const btn = e.target.closest('[data-goto-tab]');
-    if (btn) switchTab(btn.dataset.gotoTab);
+    if (btn) switchTab(btn.dataset.gotoTab, btn.dataset.scrollTarget);
   });
 
   // ── Save list bar (in optimizer tab)
@@ -3258,6 +3337,19 @@ document.addEventListener('DOMContentLoaded', () => {
     showToast('Receipt discarded');
   });
 
+  // ── Saved goals
+  document.getElementById('save-goal-btn')?.addEventListener('click', () => {
+    const nameInput = document.getElementById('save-goal-name');
+    saveCurrentGoal(nameInput?.value || '');
+    if (nameInput) nameInput.value = '';
+  });
+  document.getElementById('saved-goals-list')?.addEventListener('click', e => {
+    const useBtn = e.target.closest('.btn-use-goal');
+    if (useBtn) { useSavedGoal(useBtn.dataset.goalId); return; }
+    const delBtn = e.target.closest('.btn-delete-goal');
+    if (delBtn) { deleteSavedGoal(delBtn.dataset.goalId); return; }
+  });
+
   // ── Init
   switchTab('overview');
   const savedProfile = getProfile();
@@ -3269,4 +3361,5 @@ document.addEventListener('DOMContentLoaded', () => {
   loadLastPlannerSession();
   renderList();
   renderSavingsProof();
+  renderSavedGoals();
 });
