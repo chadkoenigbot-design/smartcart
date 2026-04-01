@@ -44,11 +44,15 @@
     <div class="header-nav">
       <div class="container">
         <nav class="nav-tabs" id="nav-tabs" role="tablist">
+          <button class="nav-tab active" data-tab="overview" role="tab" aria-selected="true" id="nav-tab-overview">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+            Home
+          </button>
           <button class="nav-tab" data-tab="profile" role="tab" aria-selected="false" id="nav-tab-profile">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span id="nav-profile-label">Profile</span>
           </button>
-          <button class="nav-tab active" data-tab="goals" role="tab" aria-selected="true">
+          <button class="nav-tab" data-tab="goals" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Planner
           </button>
@@ -59,6 +63,10 @@
           <button class="nav-tab" data-tab="budget" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             Budget
+          </button>
+          <button class="nav-tab" data-tab="how" role="tab" aria-selected="false">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            How It Works
           </button>
         </nav>
       </div>
@@ -74,11 +82,15 @@
     <aside class="sidebar" id="mobile-sidebar" aria-label="Main navigation">
       <button class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Close navigation">✕</button>
       <nav class="sidebar-nav">
+        <button class="nav-tab sidebar-nav-tab active" data-tab="overview" role="tab" aria-selected="true" id="sidebar-tab-overview">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>
+          Home
+        </button>
         <button class="nav-tab sidebar-nav-tab" data-tab="profile" role="tab" aria-selected="false" id="sidebar-tab-profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           Profile
         </button>
-        <button class="nav-tab sidebar-nav-tab active" data-tab="goals" role="tab" aria-selected="true" id="sidebar-tab-goals">
+        <button class="nav-tab sidebar-nav-tab" data-tab="goals" role="tab" aria-selected="false" id="sidebar-tab-goals">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
           Planner
         </button>
@@ -90,13 +102,11 @@
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
           Budget
         </button>
-      </nav>
-      <div class="sidebar-footer">
-        <button class="sidebar-how-btn" data-goto-tab="overview">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-          How it works
+        <button class="nav-tab sidebar-nav-tab" data-tab="how" role="tab" aria-selected="false" id="sidebar-tab-how">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          How It Works
         </button>
-      </div>
+      </nav>
     </aside>
 
     <!-- Main content area -->
@@ -557,9 +567,9 @@
 
 
   <!-- ══════════════════════════════════════════════════ -->
-  <!-- TAB: HOW IT WORKS (OVERVIEW)                      -->
+  <!-- TAB: HOME                                         -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-overview" style="display:none">
+  <div class="tab-panel" id="tab-overview">
 
     <!-- Overview hero -->
     <div class="overview-hero">
@@ -694,6 +704,38 @@
 
   </div><!-- /tab-overview -->
 
+  <!-- ══════════════════════════════════════════════════ -->
+  <!-- TAB: HOW IT WORKS                                 -->
+  <!-- ══════════════════════════════════════════════════ -->
+  <div class="tab-panel" id="tab-how" style="display:none">
+    <div class="overview-hero">
+      <div class="container">
+        <div class="overview-hero-inner">
+          <div class="overview-badge">Methodology · Placeholder</div>
+          <h1 class="overview-title">How SmartCart Works</h1>
+          <p class="overview-desc">This page is where SmartCart will explain the deeper methodology over time — including pricing analysis, household logic, perishability handling, trip economics, and budget intelligence.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="container" style="padding-bottom:56px;">
+      <div class="overview-section">
+        <h2 class="overview-section-title">What this section will explain</h2>
+        <div class="feature-grid">
+          <div class="feature-card"><h3>Pricing analysis</h3><p>How local vs warehouse comparisons are normalized and evaluated.</p></div>
+          <div class="feature-card"><h3>Waste & perishability</h3><p>How household size, storage, and shelf life affect recommendations.</p></div>
+          <div class="feature-card"><h3>Trip economics</h3><p>How SmartCart decides whether a warehouse run is actually worth it.</p></div>
+          <div class="feature-card"><h3>Budget intelligence</h3><p>How receipt capture and spending trends turn into savings suggestions.</p></div>
+        </div>
+      </div>
+
+      <div class="overview-section">
+        <h2 class="overview-section-title">Status</h2>
+        <p class="overview-desc">For now this is a placeholder trust page. As SmartCart matures, this section should become the deeper explanation of how the product makes its decisions.</p>
+        <button class="btn-overview-cta" data-goto-tab="overview">Back to Home</button>
+      </div>
+    </div>
+  </div><!-- /tab-how -->
 
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: BUDGET                                       -->
