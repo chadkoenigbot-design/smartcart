@@ -28,12 +28,15 @@
           </span>
           <span id="header-profile-name">Profile</span>
         </button>
+      </div>
+      <div class="mobile-nav-row">
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation" aria-controls="mobile-sidebar" aria-expanded="false">
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
             <line x1="3" y1="6" x2="21" y2="6"/>
             <line x1="3" y1="12" x2="21" y2="12"/>
             <line x1="3" y1="18" x2="21" y2="18"/>
           </svg>
+          <span>Open navigation</span>
         </button>
       </div>
     </div>
@@ -69,6 +72,7 @@
 
     <!-- Left sidebar / mobile drawer -->
     <aside class="sidebar" id="mobile-sidebar" aria-label="Main navigation">
+      <button class="mobile-drawer-close" id="mobile-drawer-close" aria-label="Close navigation">✕</button>
       <nav class="sidebar-nav">
         <button class="nav-tab sidebar-nav-tab" data-tab="profile" role="tab" aria-selected="false" id="sidebar-tab-profile">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>

@@ -1817,12 +1817,14 @@ function openMobileNav() {
   document.getElementById('mobile-sidebar')?.classList.add('open');
   document.getElementById('sidebar-overlay')?.classList.add('open');
   document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'true');
+  document.body.style.overflow = 'hidden';
 }
 
 function closeMobileNav() {
   document.getElementById('mobile-sidebar')?.classList.remove('open');
   document.getElementById('sidebar-overlay')?.classList.remove('open');
   document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'false');
+  document.body.style.overflow = '';
 }
 
 // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
@@ -2798,8 +2800,13 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Mobile drawer
-  document.getElementById('mobile-menu-btn')?.addEventListener('click', () => openMobileNav());
+  document.getElementById('mobile-menu-btn')?.addEventListener('click', () => {
+    const sidebar = document.getElementById('mobile-sidebar');
+    if (sidebar?.classList.contains('open')) closeMobileNav();
+    else openMobileNav();
+  });
   document.getElementById('sidebar-overlay')?.addEventListener('click', () => closeMobileNav());
+  document.getElementById('mobile-drawer-close')?.addEventListener('click', () => closeMobileNav());
 
   // ── [data-goto-tab] buttons (overview CTAs, empty state links, etc.)
   document.addEventListener('click', e => {
