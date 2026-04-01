@@ -1813,6 +1813,18 @@ function renderProfileStatus() {
 
 // ─── EVENT WIRING ─────────────────────────────────────────────────────────
 
+function openMobileNav() {
+  document.getElementById('mobile-sidebar')?.classList.add('open');
+  document.getElementById('sidebar-overlay')?.classList.add('open');
+  document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'true');
+}
+
+function closeMobileNav() {
+  document.getElementById('mobile-sidebar')?.classList.remove('open');
+  document.getElementById('sidebar-overlay')?.classList.remove('open');
+  document.getElementById('mobile-menu-btn')?.setAttribute('aria-expanded', 'false');
+}
+
 // ─── TAB NAVIGATION ──────────────────────────────────────────────────────────
 
 function switchTab(tabName) {
@@ -1828,6 +1840,7 @@ function switchTab(tabName) {
   if (tabName === 'saved')   { switchTab('profile'); return; }
   if (tabName === 'budget')  renderBudgetTab();
   if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); renderSavedLists(); }
+  closeMobileNav();
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 
@@ -2783,6 +2796,10 @@ document.addEventListener('DOMContentLoaded', () => {
   document.querySelectorAll('.nav-tab').forEach(tab => {
     tab.addEventListener('click', () => switchTab(tab.dataset.tab));
   });
+
+  // ── Mobile drawer
+  document.getElementById('mobile-menu-btn')?.addEventListener('click', () => openMobileNav());
+  document.getElementById('sidebar-overlay')?.addEventListener('click', () => closeMobileNav());
 
   // ── [data-goto-tab] buttons (overview CTAs, empty state links, etc.)
   document.addEventListener('click', e => {
