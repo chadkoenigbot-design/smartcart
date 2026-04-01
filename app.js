@@ -3069,6 +3069,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ── Init
+  switchTab('overview');
   const savedProfile = getProfile();
   if (savedProfile) {
     syncProfileToState(savedProfile);
