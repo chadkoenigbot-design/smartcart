@@ -1825,9 +1825,9 @@ function switchTab(tabName) {
   if (panel) panel.style.display = '';
   const btn = document.querySelector(`.nav-tab[data-tab="${tabName}"]`);
   if (btn) { btn.classList.add('active'); btn.setAttribute('aria-selected', 'true'); }
-  if (tabName === 'saved')   renderSavedLists();
+  if (tabName === 'saved')   { switchTab('profile'); return; }
   if (tabName === 'budget')  renderBudgetTab();
-  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); }
+  if (tabName === 'profile') { populateProfileForm(getProfile()); renderProfileHistory(); renderProfileStatus(); renderSavedLists(); }
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
 

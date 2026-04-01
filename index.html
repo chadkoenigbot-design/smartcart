@@ -34,6 +34,10 @@
     <div class="header-nav">
       <div class="container">
         <nav class="nav-tabs" id="nav-tabs" role="tablist">
+          <button class="nav-tab" data-tab="profile" role="tab" aria-selected="false" id="nav-tab-profile">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+            <span id="nav-profile-label">Profile</span>
+          </button>
           <button class="nav-tab active" data-tab="goals" role="tab" aria-selected="true">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Planner
@@ -42,26 +46,48 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Optimizer
           </button>
-          <button class="nav-tab" data-tab="saved" role="tab" aria-selected="false">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            Saved Lists
-          </button>
           <button class="nav-tab" data-tab="budget" role="tab" aria-selected="false">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             Budget
-          </button>
-          <button class="nav-tab" data-tab="overview" role="tab" aria-selected="false">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            How It Works
-          </button>
-          <button class="nav-tab" data-tab="profile" role="tab" aria-selected="false" id="nav-tab-profile">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <span id="nav-profile-label">Profile</span>
           </button>
         </nav>
       </div>
     </div>
   </header>
+
+  <!-- App layout: sidebar (desktop) + content -->
+  <div class="app-body">
+
+    <!-- Left sidebar — desktop only -->
+    <aside class="sidebar" aria-label="Main navigation">
+      <nav class="sidebar-nav">
+        <button class="nav-tab sidebar-nav-tab" data-tab="profile" role="tab" aria-selected="false" id="sidebar-tab-profile">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </button>
+        <button class="nav-tab sidebar-nav-tab active" data-tab="goals" role="tab" aria-selected="true" id="sidebar-tab-goals">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+          Planner
+        </button>
+        <button class="nav-tab sidebar-nav-tab" data-tab="optimizer" role="tab" aria-selected="false" id="sidebar-tab-optimizer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+          Optimizer
+        </button>
+        <button class="nav-tab sidebar-nav-tab" data-tab="budget" role="tab" aria-selected="false" id="sidebar-tab-budget">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+          Budget
+        </button>
+      </nav>
+      <div class="sidebar-footer">
+        <button class="sidebar-how-btn" data-goto-tab="overview">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          How it works
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main content area -->
+    <div class="app-content">
 
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: OPTIMIZER (default)                          -->
@@ -480,6 +506,28 @@
             </div>
           </div>
 
+          <!-- How SmartCart Works — collapsible intro -->
+          <details class="how-it-works-inline">
+            <summary class="how-it-works-summary">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              How SmartCart works
+            </summary>
+            <div class="how-it-works-steps-inline">
+              <div class="hiw-step-inline">
+                <div class="hiw-step-num">1</div>
+                <div><strong>Set Your Profile</strong> — tell SmartCart your household size, ZIP, and membership. This personalizes every recommendation.</div>
+              </div>
+              <div class="hiw-step-inline">
+                <div class="hiw-step-num">2</div>
+                <div><strong>Plan Your List</strong> — describe your goals, health needs, or cravings and get a tailored grocery list in seconds.</div>
+              </div>
+              <div class="hiw-step-inline">
+                <div class="hiw-step-num">3</div>
+                <div><strong>Optimize for Price</strong> — send your list to the Optimizer to see exactly what to buy at the warehouse vs. local store.</div>
+              </div>
+            </div>
+          </details>
+
         </section>
       </div>
     </main>
@@ -491,62 +539,7 @@
   <!-- TAB: SAVED LISTS                                  -->
   <!-- ══════════════════════════════════════════════════ -->
   <div class="tab-panel" id="tab-saved" style="display:none">
-
-    <main class="main" style="padding-top:32px">
-      <div class="container">
-        <section class="section" style="padding-top:0">
-
-          <div class="section-header saved-section-header">
-            <div class="section-header-text">
-              <h2 class="section-title">Saved Shopping Lists</h2>
-              <p class="section-sub">Your lists are stored locally in your browser — no account needed</p>
-            </div>
-            <button class="btn-save-current" id="save-current-btn">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-              Save Current List
-            </button>
-          </div>
-
-          <!-- Inline save form -->
-          <div class="save-form-card card" id="save-form" style="display:none">
-            <div class="save-form-inner">
-              <div>
-                <div class="card-title" style="margin-bottom:4px">Name this list</div>
-                <div class="card-sub">Choose something descriptive — you can save multiple lists</div>
-              </div>
-              <div class="save-form-fields">
-                <input type="text" id="save-name-input" class="text-input" placeholder="e.g. Weekly Staples, Costco Run, Keto Week..." maxlength="40">
-                <div class="save-form-btns">
-                  <button class="btn-save-confirm" id="save-submit-btn">Save List</button>
-                  <button class="btn-save-cancel" id="save-form-cancel">Cancel</button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- No current list warning -->
-          <div class="no-current-list-note" id="no-current-list-note" style="display:none">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-            Your grocery list is empty. <button class="btn-inline-link" data-goto-tab="optimizer">Go to the Optimizer</button> to build a list first.
-          </div>
-
-          <!-- Empty state -->
-          <div id="saved-empty" class="saved-empty-state">
-            <div class="saved-empty-icon">
-              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
-            </div>
-            <div class="saved-empty-title">No saved lists yet</div>
-            <div class="saved-empty-sub">Build a grocery list in the Optimizer — or start from a fitness goal — and save it here to reload anytime.</div>
-            <button class="btn-outline" data-goto-tab="optimizer" style="margin-top:16px">Go to Optimizer</button>
-          </div>
-
-          <!-- Saved lists container -->
-          <div id="saved-lists-container"></div>
-
-        </section>
-      </div>
-    </main>
-
+    <!-- Saved Lists are now shown in the Profile tab -->
   </div><!-- /tab-saved -->
 
 
@@ -599,7 +592,7 @@
               </div>
               <h3 class="feature-card-title">Saved Lists</h3>
               <p class="feature-card-desc">Save your shopping lists locally in your browser. Name them, load them on future visits, update them as your needs change, or delete ones you no longer need. No account required.</p>
-              <button class="feature-card-btn" data-goto-tab="saved">View Saved Lists</button>
+              <button class="feature-card-btn" data-goto-tab="profile">View Saved Lists</button>
             </div>
 
           </div>
@@ -1040,12 +1033,60 @@
           </div>
           <div id="profile-history-list" class="profile-history-list"></div>
 
+          <!-- SAVED LISTS (moved here from separate tab) -->
+          <div class="profile-form-section-label profile-history-label" style="margin-top:32px">
+            Saved Lists
+            <button class="btn-save-current" id="save-current-btn">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+              Save Current List
+            </button>
+          </div>
+
+          <!-- Inline save form -->
+          <div class="save-form-card card" id="save-form" style="display:none">
+            <div class="save-form-inner">
+              <div>
+                <div class="card-title" style="margin-bottom:4px">Name this list</div>
+                <div class="card-sub">Choose something descriptive — you can save multiple lists</div>
+              </div>
+              <div class="save-form-fields">
+                <input type="text" id="save-name-input" class="text-input" placeholder="e.g. Weekly Staples, Costco Run, Keto Week..." maxlength="40">
+                <div class="save-form-btns">
+                  <button class="btn-save-confirm" id="save-submit-btn">Save List</button>
+                  <button class="btn-save-cancel" id="save-form-cancel">Cancel</button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- No current list warning -->
+          <div class="no-current-list-note" id="no-current-list-note" style="display:none">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            Your grocery list is empty. <button class="btn-inline-link" data-goto-tab="optimizer">Go to the Optimizer</button> to build a list first.
+          </div>
+
+          <!-- Empty state -->
+          <div id="saved-empty" class="saved-empty-state">
+            <div class="saved-empty-icon">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
+            </div>
+            <div class="saved-empty-title">No saved lists yet</div>
+            <div class="saved-empty-sub">Build a grocery list in the Optimizer — or start from a fitness goal — and save it here to reload anytime.</div>
+            <button class="btn-outline" data-goto-tab="optimizer" style="margin-top:16px">Go to Optimizer</button>
+          </div>
+
+          <!-- Saved lists container -->
+          <div id="saved-lists-container"></div>
+
         </section>
       </div>
     </main>
 
   </div><!-- /tab-profile -->
 
+
+    </div><!-- /app-content -->
+  </div><!-- /app-body -->
 
   <footer class="site-footer">
     <div class="container">
