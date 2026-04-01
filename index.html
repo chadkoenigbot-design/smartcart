@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <!-- Header -->
   <header class="header">
@@ -52,19 +53,19 @@
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
             <span id="nav-profile-label">Profile</span>
           </button>
-          <button class="nav-tab" data-tab="goals" role="tab" aria-selected="false">
+          <button class="nav-tab" data-tab="goals" role="tab" aria-selected="false" id="nav-tab-goals">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
             Planner
           </button>
-          <button class="nav-tab" data-tab="optimizer" role="tab" aria-selected="false">
+          <button class="nav-tab" data-tab="optimizer" role="tab" aria-selected="false" id="nav-tab-optimizer">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             Optimizer
           </button>
-          <button class="nav-tab" data-tab="budget" role="tab" aria-selected="false">
+          <button class="nav-tab" data-tab="budget" role="tab" aria-selected="false" id="nav-tab-budget">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
             Budget
           </button>
-          <button class="nav-tab" data-tab="how" role="tab" aria-selected="false">
+          <button class="nav-tab" data-tab="how" role="tab" aria-selected="false" id="nav-tab-how">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             How It Works
           </button>
@@ -110,12 +111,12 @@
     </aside>
 
     <!-- Main content area -->
-    <div class="app-content">
+    <main class="app-content" id="main-content">
 
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: OPTIMIZER (default)                          -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-optimizer" style="display:none">
+  <div class="tab-panel" id="tab-optimizer" role="tabpanel" aria-labelledby="nav-tab-optimizer sidebar-tab-optimizer" style="display:none">
 
     <!-- Hero -->
     <div class="hero">
@@ -151,7 +152,7 @@
     </div>
 
     <!-- Main -->
-    <main class="main">
+    <div class="main">
       <div class="container">
 
         <!-- Section 1: Profile -->
@@ -415,7 +416,7 @@
         </section>
 
       </div>
-    </main>
+    </div>
 
   </div><!-- /tab-optimizer -->
 
@@ -423,7 +424,7 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: FITNESS GOALS                                -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-goals">
+  <div class="tab-panel" id="tab-goals" role="tabpanel" aria-labelledby="nav-tab-goals sidebar-tab-goals">
 
     <div class="goals-hero goals-hero-with-img" style="background-image:url('https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?auto=format&fit=crop&w=1400&q=80')">
       <div class="goals-hero-overlay"></div>
@@ -436,7 +437,7 @@
       </div>
     </div>
 
-    <main class="main">
+    <div class="main">
       <div class="container">
         <section class="section" style="padding-top:0">
 
@@ -553,7 +554,7 @@
 
         </section>
       </div>
-    </main>
+    </div>
 
   </div><!-- /tab-goals -->
 
@@ -569,15 +570,26 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: HOME                                         -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-overview">
+  <div class="tab-panel" id="tab-overview" role="tabpanel" aria-labelledby="nav-tab-overview sidebar-tab-overview">
 
     <!-- Overview hero -->
     <div class="overview-hero">
       <div class="container">
         <div class="overview-hero-inner">
           <div class="overview-badge">Free &nbsp;·&nbsp; No account needed &nbsp;·&nbsp; 100% local & private</div>
-          <h1 class="overview-title">The Smart Way to Grocery Shop</h1>
-          <p class="overview-desc">SmartCart is your personal grocery strategist — comparing warehouse club vs. local prices, factoring in household size, location, and perishability to tell you exactly where to buy every item on your list.</p>
+          <p class="overview-kicker">Your grocery copilot for the Costco vs. corner-store dilemma</p>
+          <h1 class="overview-title">Stop guessing where each item should come from</h1>
+          <p class="overview-desc">Warehouse clubs feel cheaper, but membership fees, bulk waste, and extra trips can wipe out the savings. SmartCart models every variable — household size, perishability, trip value, and local promos — so you know exactly when Costco wins and when your neighborhood market is the smarter move.</p>
+          <div class="overview-challenge-card">
+            <div class="challenge-label">The reality we solve</div>
+            <p class="challenge-intro">Buying in bulk only works when the hidden costs stay in check. Here’s why most households still overspend:</p>
+            <ul class="challenge-list">
+              <li>Warehouse-size packs spoil before smaller households finish them.</li>
+              <li>Membership dues + extra drives can erase per-unit savings.</li>
+              <li>Local specials often beat pallet pricing, but they’re hard to track.</li>
+            </ul>
+            <p class="challenge-note">SmartCart crunches all of it automatically — so every item on your list has a confident, data-backed destination.</p>
+          </div>
           <div class="overview-feature-list">
             <div class="overview-feature-pill">Persistent profile &amp; saved lists</div>
             <div class="overview-feature-pill">Goal-based planner chat</div>
@@ -590,7 +602,7 @@
       </div>
     </div>
 
-    <main class="main">
+    <div class="main">
       <div class="container">
 
         <!-- Feature Cards -->
@@ -716,38 +728,38 @@
         </div>
 
       </div>
-    </main>
+    </div>
 
   </div><!-- /tab-overview -->
 
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: HOW IT WORKS                                 -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-how" style="display:none">
+  <div class="tab-panel" id="tab-how" role="tabpanel" aria-labelledby="nav-tab-how sidebar-tab-how" style="display:none">
     <div class="overview-hero">
       <div class="container">
         <div class="overview-hero-inner">
-          <div class="overview-badge">Methodology · Placeholder</div>
+          <div class="overview-badge">Methodology</div>
           <h1 class="overview-title">How SmartCart Works</h1>
-          <p class="overview-desc">This page is where SmartCart will explain the deeper methodology over time — including pricing analysis, household logic, perishability handling, trip economics, and budget intelligence.</p>
+          <p class="overview-desc">SmartCart combines four decision factors — pricing data, household size, perishability risk, and trip economics — to recommend exactly where each item on your list should be purchased.</p>
         </div>
       </div>
     </div>
 
     <div class="container" style="padding-bottom:56px;">
       <div class="overview-section">
-        <h2 class="overview-section-title">What this section will explain</h2>
+        <h2 class="overview-section-title">The Four Decision Factors</h2>
         <div class="feature-grid">
-          <div class="feature-card"><h3>Pricing analysis</h3><p>How local vs warehouse comparisons are normalized and evaluated.</p></div>
-          <div class="feature-card"><h3>Waste & perishability</h3><p>How household size, storage, and shelf life affect recommendations.</p></div>
-          <div class="feature-card"><h3>Trip economics</h3><p>How SmartCart decides whether a warehouse run is actually worth it.</p></div>
-          <div class="feature-card"><h3>Budget intelligence</h3><p>How receipt capture and spending trends turn into savings suggestions.</p></div>
+          <div class="feature-card"><h3 class="feature-card-title">Pricing Analysis</h3><p class="feature-card-desc">Unit prices from warehouse clubs and local grocers are normalized by weight and volume so every comparison is apples-to-apples.</p></div>
+          <div class="feature-card"><h3 class="feature-card-title">Waste &amp; Perishability</h3><p class="feature-card-desc">Household size, storage capacity, and shelf life determine whether bulk quantities save money or create waste.</p></div>
+          <div class="feature-card"><h3 class="feature-card-title">Trip Economics</h3><p class="feature-card-desc">SmartCart evaluates whether a warehouse run is worth the drive by weighing total basket value against distance and time.</p></div>
+          <div class="feature-card"><h3 class="feature-card-title">Budget Intelligence</h3><p class="feature-card-desc">Receipt capture and category-level spending trends surface actionable savings nudges tailored to your habits.</p></div>
         </div>
       </div>
 
       <div class="overview-section">
-        <h2 class="overview-section-title">Status</h2>
-        <p class="overview-desc">For now this is a placeholder trust page. As SmartCart matures, this section should become the deeper explanation of how the product makes its decisions.</p>
+        <h2 class="overview-section-title">What's Next</h2>
+        <p class="overview-desc">This page will expand with deeper methodology detail — including regional pricing models, seasonal adjustment logic, and multi-store trip planning — as SmartCart continues to grow.</p>
         <button class="btn-overview-cta" data-goto-tab="overview">Back to Home</button>
       </div>
     </div>
@@ -756,7 +768,7 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: BUDGET                                       -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-budget" style="display:none">
+  <div class="tab-panel" id="tab-budget" role="tabpanel" aria-labelledby="nav-tab-budget sidebar-tab-budget" style="display:none">
 
     <!-- Hero -->
     <div class="budget-tab-hero">
@@ -773,7 +785,7 @@
       </div>
     </div>
 
-    <main class="main">
+    <div class="main">
       <div class="container">
 
         <!-- ── Budget Settings ── -->
@@ -895,7 +907,7 @@
         <div id="budget-receipts-list" style="display:none"><!-- rendered by JS --></div>
 
       </div>
-    </main>
+    </div>
 
   </div><!-- /tab-budget -->
 
@@ -903,7 +915,7 @@
   <!-- ══════════════════════════════════════════════════ -->
   <!-- TAB: PROFILE                                      -->
   <!-- ══════════════════════════════════════════════════ -->
-  <div class="tab-panel" id="tab-profile" style="display:none">
+  <div class="tab-panel" id="tab-profile" role="tabpanel" aria-labelledby="nav-tab-profile sidebar-tab-profile" style="display:none">
 
     <!-- Profile Hero -->
     <div class="profile-tab-hero">
@@ -922,7 +934,7 @@
     <!-- Profile Status Bar -->
     <div id="profile-status-bar" class="profile-status-bar" style="display:none"></div>
 
-    <main class="main">
+    <div class="main">
       <div class="container">
         <section class="section" style="padding-top:0">
 
@@ -1151,12 +1163,12 @@
 
         </section>
       </div>
-    </main>
+    </div>
 
   </div><!-- /tab-profile -->
 
 
-    </div><!-- /app-content -->
+    </main><!-- /app-content -->
   </div><!-- /app-body -->
 
   <footer class="site-footer">
