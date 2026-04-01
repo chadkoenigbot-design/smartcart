@@ -309,6 +309,7 @@
                   <span class="list-col-item">Item</span>
                   <span class="list-col-cat">Category</span>
                   <span class="list-col-qty">Qty</span>
+                  <span class="list-col-promo">Promo</span>
                   <span class="list-col-actions"></span>
                 </div>
                 <div id="list-items"></div>
@@ -605,6 +606,15 @@
     <div class="main">
       <div class="container">
 
+        <!-- Savings Proof -->
+        <section class="savings-proof" id="savings-proof" aria-label="Savings Proof">
+          <h2 class="savings-proof-title">See the math before you shop</h2>
+          <p class="savings-proof-intro">SmartCart runs the Costco-vs.-local math for you. Here are five common items — with real break-even quantities and a clear verdict.</p>
+          <div class="savings-proof-grid" id="savings-proof-grid">
+            <!-- rendered by JS -->
+          </div>
+        </section>
+
         <!-- Feature Cards -->
         <div class="overview-section">
           <h2 class="overview-section-title">Everything SmartCart Can Do</h2>
@@ -860,6 +870,12 @@
         <div class="budget-block-label" id="budget-cats-label" style="display:none">Spending by Category</div>
         <div class="card budget-categories-card" id="budget-categories-card" style="display:none">
           <div id="budget-categories-content"></div>
+        </div>
+
+        <!-- ── Receipt Insights ── -->
+        <div class="budget-block-label" id="receipt-insights-label" style="display:none">Receipt Insights</div>
+        <div class="card budget-insights-card" id="receipt-insights-card" style="display:none">
+          <div id="receipt-insights-content"></div>
         </div>
 
         <!-- ── Smart Tips ── -->

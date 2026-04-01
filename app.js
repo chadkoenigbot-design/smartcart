@@ -254,6 +254,103 @@ function findExactItem(name) {
   ) || searchCatalog(q)[0] || null;
 }
 
+// ─── LOCAL PROMO DISCOUNT ─────────────────────────────────────────────────
+// Applied to local price when user toggles "Local promo" on an item.
+const LOCAL_PROMO_DISCOUNT = 0.15; // 15%
+
+// ─── SAVINGS PROOF DATA ──────────────────────────────────────────────────
+const SAVINGS_PROOF_ITEMS = [
+  {
+    name: 'Eggs',
+    category: 'dairy',
+    localPrice: 5.49,
+    warehousePrice: 3.19,
+    unit: 'dozen',
+    warehouseMin: 2,
+    breakEvenQty: 1,
+    verdict: 'costco',
+    note: 'You save $2.30/dozen — even buying just two cartons pays off immediately.',
+  },
+  {
+    name: 'Butter',
+    category: 'dairy',
+    localPrice: 5.99,
+    warehousePrice: 3.49,
+    unit: 'lb',
+    warehouseMin: 2,
+    breakEvenQty: 1,
+    verdict: 'costco',
+    note: 'Butter freezes well. At 42% savings per lb, warehouse wins for any household.',
+  },
+  {
+    name: 'Baby Spinach',
+    category: 'produce',
+    localPrice: 3.99,
+    warehousePrice: 2.49,
+    unit: 'bag',
+    warehouseMin: 1,
+    breakEvenQty: 3,
+    verdict: 'local',
+    note: 'Spinach wilts in 5 days. Unless you eat 3+ bags/week, buy local to avoid waste.',
+  },
+  {
+    name: 'Laundry Detergent',
+    category: 'cleaning',
+    localPrice: 14.99,
+    warehousePrice: 7.99,
+    unit: 'bottle',
+    warehouseMin: 1,
+    breakEvenQty: 1,
+    verdict: 'costco',
+    note: 'Non-perishable and 47% cheaper — one of the strongest warehouse club buys.',
+  },
+  {
+    name: 'Paper Towels',
+    category: 'cleaning',
+    localPrice: 2.49,
+    warehousePrice: 0.99,
+    unit: 'roll',
+    warehouseMin: 6,
+    breakEvenQty: 3,
+    verdict: 'costco',
+    note: '60% per-roll savings. You need 6 rolls minimum, but they never expire.',
+  },
+];
+
+function renderSavingsProof() {
+  const grid = document.getElementById('savings-proof-grid');
+  if (!grid) return;
+  grid.innerHTML = SAVINGS_PROOF_ITEMS.map(item => {
+    const isCostco = item.verdict === 'costco';
+    const savingsPct = Math.round((1 - item.warehousePrice / item.localPrice) * 100);
+    const badgeClass = isCostco ? 'sp-badge-costco' : 'sp-badge-local';
+    const badgeText = isCostco ? 'Costco wins' : 'Buy local';
+    const catMeta = CATEGORIES[item.category] || {};
+    return `<div class="sp-card">
+      <div class="sp-card-header">
+        <span class="sp-card-icon">${catMeta.icon || '🛒'}</span>
+        <span class="sp-card-name">${item.name}</span>
+        <span class="sp-badge ${badgeClass}">${badgeText}</span>
+      </div>
+      <div class="sp-prices">
+        <div class="sp-price-row">
+          <span class="sp-price-label">Local</span>
+          <span class="sp-price-val">${fmt(item.localPrice)}/${item.unit}</span>
+        </div>
+        <div class="sp-price-row">
+          <span class="sp-price-label">Warehouse</span>
+          <span class="sp-price-val sp-price-hl">${fmt(item.warehousePrice)}/${item.unit}</span>
+        </div>
+        <div class="sp-price-row sp-price-meta">
+          <span>Break-even: ${item.breakEvenQty} ${item.unit}${item.breakEvenQty > 1 ? 's' : ''}</span>
+          <span class="sp-save-pct">${savingsPct}% off</span>
+        </div>
+      </div>
+      <p class="sp-note">${item.note}</p>
+    </div>`;
+  }).join('');
+}
+
 // ─── RECOMMENDATION ENGINE ────────────────────────────────────────────────
 
 // For perishables, estimate what fraction of a bulk purchase the household will
@@ -296,8 +393,14 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
   const unit = catalogItem ? catalogItem.unit : 'each';
   const warehouseMin = catalogItem ? catalogItem.warehouseMin : 2;
 
-  const localPrice = baseLocalPrice * tier.localMultiplier;
+  let localPrice = baseLocalPrice * tier.localMultiplier;
   const warehousePrice = baseWarehousePrice * tier.warehouseMultiplier;
+
+  // Apply local promo discount if toggled on
+  const hasLocalPromo = !!item.localPromo;
+  if (hasLocalPromo) {
+    localPrice = localPrice * (1 - LOCAL_PROMO_DISCOUNT);
+  }
 
   const reqQty = Math.max(1, parseInt(item.quantity, 10) || 1);
   const localQty = reqQty;
@@ -418,9 +521,10 @@ function analyzeItem(item, householdSize, locationInfo, hasMembership) {
     recLabel: label,
     confidence,
     actualSavings: Math.max(0, actualSavings),
-    reasoning,
+    reasoning: hasLocalPromo ? reasoning + ' (Local promo applied — ' + Math.round(LOCAL_PROMO_DISCOUNT * 100) + '% discount factored in.)' : reasoning,
     perUnitPct,
     householdScore,
+    hasLocalPromo,
   };
 }
 
@@ -583,6 +687,7 @@ function renderList() {
     const catName = cat ? cat.name : 'General';
     const catKey = item.catalogItem ? item.catalogItem.category : 'pantry';
     const unit = item.catalogItem ? item.catalogItem.unit : 'each';
+    const promoActive = item.localPromo ? ' active' : '';
     return `<div class="list-item-row" data-id="${item.id}">
       <span class="list-item-name">${item.name}</span>
       <span class="list-item-cat">
@@ -590,6 +695,7 @@ function renderList() {
         ${catName}
       </span>
       <span class="list-item-qty">${item.quantity} ${unit}</span>
+      <button class="promo-toggle${promoActive}" data-id="${item.id}" aria-label="Toggle local promo for ${item.name}" aria-pressed="${!!item.localPromo}">Local promo</button>
       <button class="list-item-remove" data-id="${item.id}" title="Remove item">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
@@ -598,6 +704,16 @@ function renderList() {
 
   listItems.querySelectorAll('.list-item-remove').forEach(btn => {
     btn.addEventListener('click', () => removeItem(parseInt(btn.dataset.id)));
+  });
+  listItems.querySelectorAll('.promo-toggle').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = parseInt(btn.dataset.id);
+      const item = state.groceryList.find(i => i.id === id);
+      if (item) {
+        item.localPromo = !item.localPromo;
+        renderList();
+      }
+    });
   });
 }
 
@@ -608,6 +724,7 @@ function addItem(name, quantity) {
     name: catalogItem ? catalogItem.name : name,
     quantity: Math.max(1, parseInt(quantity, 10) || 1),
     catalogItem,
+    localPromo: false,
   });
   renderList();
 }
@@ -678,7 +795,7 @@ function buildRecItemHTML(r) {
     <div class="rec-item-icon" style="background:${bg};color:${col}">${r.catMeta.icon}</div>
     <div class="rec-item-body">
       <div class="rec-item-name">
-        ${r.catalogName}
+        ${r.catalogName}${r.hasLocalPromo ? ' <span class="local-promo-chip">Local promo</span>' : ''}
         <small>× ${r.localQty} ${r.unit}</small>
       </div>
       <div class="rec-item-reasoning">${r.reasoning}</div>
@@ -710,7 +827,7 @@ function buildShoppingPlan(analysis) {
     <li class="plan-item" tabindex="0">
       <span class="plan-check" aria-hidden="true"></span>
       <span class="plan-item-icon" aria-hidden="true">${r.catMeta.icon}</span>
-      <span class="plan-item-name">${r.catalogName}</span>
+      <span class="plan-item-name">${r.catalogName}${r.hasLocalPromo ? ' <span class="local-promo-chip">Local promo</span>' : ''}</span>
       <span class="plan-item-qty">× ${r.localQty} ${r.unit}</span>
     </li>`).join('');
 
@@ -1446,6 +1563,7 @@ function renderBudgetTab() {
 
   renderBudgetSummary();
   renderSpendingCategories();
+  renderReceiptInsights();
   renderBudgetRecommendations();
   renderReceiptHistory();
 }
@@ -1558,6 +1676,76 @@ function renderSpendingCategories() {
         </div>
       </div>`;
   }).join('');
+}
+
+function renderReceiptInsights() {
+  const card  = document.getElementById('receipt-insights-card');
+  const label = document.getElementById('receipt-insights-label');
+  const el    = document.getElementById('receipt-insights-content');
+  if (!el) return;
+
+  const allReceipts = getReceipts();
+  if (allReceipts.length === 0) {
+    if (card)  card.style.display  = 'none';
+    if (label) label.style.display = 'none';
+    return;
+  }
+  if (card)  card.style.display  = '';
+  if (label) label.style.display = '';
+
+  const totalReceipts = allReceipts.length;
+  const lifetimeSpend = allReceipts.reduce((s, r) => s + r.total, 0);
+  const avgPerTrip = lifetimeSpend / totalReceipts;
+
+  // Top spend category
+  const catTotals = aggregateByCategory(allReceipts);
+  const totalCatSpend = Object.values(catTotals).reduce((s, v) => s + v, 0);
+  const sortedCats = Object.entries(catTotals).sort((a, b) => b[1] - a[1]);
+  const topCat = sortedCats[0] || ['other', 0];
+  const topCatPct = totalCatSpend > 0 ? Math.round(topCat[1] / totalCatSpend * 100) : 0;
+  const CAT_NAMES = {
+    produce: 'Produce', dairy: 'Dairy', meat: 'Protein', pantry: 'Pantry',
+    frozen: 'Frozen', beverages: 'Beverages', snacks: 'Snacks',
+    cleaning: 'Household', personal: 'Personal Care', bakery: 'Bakery', specialty: 'Specialty',
+  };
+  const topCatName = CAT_NAMES[topCat[0]] || topCat[0];
+
+  // Most-frequent store (tie-break by highest spend)
+  const storeStats = {};
+  allReceipts.forEach(r => {
+    const s = r.store || 'Unknown';
+    if (!storeStats[s]) storeStats[s] = { count: 0, spend: 0 };
+    storeStats[s].count++;
+    storeStats[s].spend += r.total;
+  });
+  const topStore = Object.entries(storeStats)
+    .sort((a, b) => b[1].count - a[1].count || b[1].spend - a[1].spend)[0];
+  const topStoreName = topStore ? topStore[0] : '—';
+
+  el.innerHTML = `
+    <div class="ri-grid">
+      <div class="ri-stat">
+        <div class="ri-stat-value">${totalReceipts}</div>
+        <div class="ri-stat-label">Total receipts</div>
+      </div>
+      <div class="ri-stat">
+        <div class="ri-stat-value">$${lifetimeSpend.toFixed(2)}</div>
+        <div class="ri-stat-label">Lifetime spend</div>
+      </div>
+      <div class="ri-stat">
+        <div class="ri-stat-value">$${avgPerTrip.toFixed(2)}</div>
+        <div class="ri-stat-label">Avg per trip</div>
+      </div>
+      <div class="ri-stat">
+        <div class="ri-stat-value">${topCatName}</div>
+        <div class="ri-stat-label">Top category · ${topCatPct}%</div>
+      </div>
+      <div class="ri-stat">
+        <div class="ri-stat-value">${escHtml(topStoreName)}</div>
+        <div class="ri-stat-label">Most visited store</div>
+      </div>
+    </div>
+  `;
 }
 
 function renderBudgetRecommendations() {
@@ -1679,6 +1867,7 @@ function renderReceiptHistory() {
       renderReceiptHistory();
       renderBudgetSummary();
       renderSpendingCategories();
+      renderReceiptInsights();
       renderBudgetRecommendations();
       showToast('Receipt removed');
     });
@@ -1745,6 +1934,7 @@ function confirmReceipt() {
   resetReceiptCapture();
   renderBudgetSummary();
   renderSpendingCategories();
+  renderReceiptInsights();
   renderBudgetRecommendations();
   renderReceiptHistory();
   showToast('Receipt added to budget!');
@@ -1866,7 +2056,7 @@ function saveListAs(name) {
   const entry = {
     id: existing ? existing.id : Date.now().toString(),
     name: name.trim(),
-    items: state.groceryList.map(i => ({ name: i.name, quantity: i.quantity })),
+    items: state.groceryList.map(i => ({ name: i.name, quantity: i.quantity, localPromo: !!i.localPromo })),
     savedAt: new Date().toISOString(),
     goalText:         hasCurrentGoal ? currentGoalState.goalText         : (existing ? existing.goalText         : ''),
     goalProfileKey:   hasCurrentGoal ? (currentGoalState.baseProfile ? currentGoalState.baseProfile.key : null) : (existing ? existing.goalProfileKey   : null),
@@ -1967,7 +2157,7 @@ function deleteList(id) {
 function loadList(id) {
   const list = getSavedLists().find(l => l.id === id);
   if (!list) return;
-  state.groceryList = list.items.map(i => ({ name: i.name, quantity: i.quantity, id: state.nextId++, catalogItem: findExactItem(i.name) || null }));
+  state.groceryList = list.items.map(i => ({ name: i.name, quantity: i.quantity, localPromo: !!i.localPromo, id: state.nextId++, catalogItem: findExactItem(i.name) || null }));
   renderList();
   switchTab('optimizer');
   setTimeout(() => { const s = document.getElementById('section-list'); if (s) s.scrollIntoView({ behavior: 'smooth' }); }, 320);
@@ -3078,4 +3268,5 @@ document.addEventListener('DOMContentLoaded', () => {
   renderProfileGoalHint();
   loadLastPlannerSession();
   renderList();
+  renderSavingsProof();
 });
